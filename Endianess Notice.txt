@@ -1,0 +1,9 @@
+Endianness Notice
+-----------------
+This project currently stores all 32-bit integer fields in the native
+endianness of the host system. On little-endian systems (x86, x64, ARM64)
+files are written in little-endian format. On big-endian systems, files
+are written in big-endian format.
+
+Files are therefore *not* cross-endian compatible.
+
