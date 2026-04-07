@@ -27,8 +27,6 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Network Svg)
 find_package(Qt6 REQUIRED COMPONENTS Core)
 
-set(QM_FILES ${CMAKE_SOURCE_DIR}/translations/qt_en.qm)
-
 if(APPLE)
 set(MACOSX_BUNDLE_ICON_FILE app.icns)
 set(APP_ICON "${CMAKE_SOURCE_DIR}/app.icns")
@@ -106,38 +104,3 @@ install(TARGETS ${PROJECT_NAME}
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(${PROJECT_NAME})
 endif()
-
-# --- Windows ---
-if(WIN32)
-    set(QM_DEST ${CMAKE_BINARY_DIR}/translations)
-    add_custom_command(
-        TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${QM_DEST}
-        COMMAND ${CMAKE_COMMAND} -E copy ${QM_FILES} ${QM_DEST}
-    )
-endif()
-
-# --- macOS ---
-if(APPLE)
-    # app bundle
-    set(QM_DEST ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.app/Contents/Resources/i18n)
-    add_custom_command(
-        TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${QM_DEST}
-        COMMAND ${CMAKE_COMMAND} -E copy ${QM_FILES} ${QM_DEST}
-    )
-endif()
-
-# --- Linux/Unix ---
-if(UNIX AND NOT APPLE)
-    # local
-    set(QM_DEST ${CMAKE_BINARY_DIR}/translations)
-    add_custom_command(
-        TARGET ${PROJECT_NAME} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${QM_DEST}
-        COMMAND ${CMAKE_COMMAND} -E copy ${QM_FILES} ${QM_DEST}
-    )
-    # system
-    install(FILES ${QM_FILES} DESTINATION share/${PROJECT_NAME}/translations)
-endif()
-
