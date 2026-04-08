@@ -25,10 +25,10 @@ All cryptographic routines are implemented in modern, idiomatic C++ and validate
 ⚠️ **Endianness Notice (Important)**
 SecretJournalQt currently stores all 32‑bit integer fields using the native endianness of the host system.
 - On little‑endian systems (x86, x64, ARM64), files are written in little‑endian format
-- On big‑endian systems, files are written in big‑endian format
-As a result:
+- On big‑endian systems, files are written in big‑endian format. As a result:
 ❌ Files are not cross‑endian compatible.
 A journal created on a little‑endian machine cannot be opened on a big‑endian machine, and vice versa.
+
 Given that the primary target platforms are Windows and macOS - both universally little‑endian - introducing additional complexity for cross‑endian compatibility would provide no practical benefit. For this reason, the current design intentionally avoids extra abstraction layers or conversion logic.
 
 #### Credits
