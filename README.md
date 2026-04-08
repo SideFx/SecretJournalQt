@@ -31,5 +31,7 @@ As a result:
 A journal created on a little‑endian machine cannot be opened on a big‑endian machine, and vice versa.
 Given that the primary target platforms are Windows and macOS - both universally little‑endian - introducing additional complexity for cross‑endian compatibility would provide no practical benefit. For this reason, the current design intentionally avoids extra abstraction layers or conversion logic.
 
+#### Credits
+[Special thanks to Martin Mitáš (mity) and all contributors to the md4c library.](https://github.com/mity/md4c)
 
 
