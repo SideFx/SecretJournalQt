@@ -34,4 +34,15 @@ Given that the primary target platforms are Windows and macOS - both universally
 #### Credits
 [Special thanks to Martin Mitáš (mity) and all contributors to the md4c library.](https://github.com/mity/md4c)
 
+#### Updates
+**2026-04-09:**
+- macOS UI fixes only:
+- added splitter handle stylesheets to splitters to reduce handle with
+- explicitly set handle width to zero in viewer only mode since hiding the handle completely failed: 
+auto *handle = m_editorSplitter->handle(1);
+    if (handle) {
+        handle->setVisible(false); //didn't work
+        handle->setEnabled(false);
+    }
+- applying the unified tool-/statusbar setting for macOS also failed (applied a custom stylesheet to the statusbar to match background color with the toolbar)
 

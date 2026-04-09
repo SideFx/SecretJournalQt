@@ -3,7 +3,7 @@
 // Purpose:     The main window
 // Author:      Jan Buchholz
 // Created:     2025-10-13
-// Changed:     2026-04-07
+// Changed:     2026-04-08
 /////////////////////////////////////////////////////////////////////////////
 
 #include "mainwindow.h"
@@ -139,10 +139,22 @@ void MainWindow::createSplitters() {
     m_editorSplitter->addWidget(mc_uiLogic->getmdEditor());
     m_mainSplitter->addWidget(m_editorSplitter);
     m_mainSplitter->setChildrenCollapsible(false);
+    auto *handle = m_treeSplitter->handle(1);
+    if (handle) {
+        handle->setVisible(false);
+        handle->setEnabled(false);
+    }
+#if defined(Q_OS_MAC)
+    m_mainSplitter->setStyleSheet(styleSplitterHandle);
+    m_editorSplitter->setStyleSheet(styleSplitterHandle);
+#endif
 }
 
 void MainWindow::createStatusBar() {
     m_statusBar = new QStatusBar;
+#if defined(Q_OS_MAC)
+    m_statusBar->setStyleSheet("QStatusBar {background: lightGray;}");
+#endif
     this->setStatusBar(m_statusBar);
 }
 
@@ -277,8 +289,17 @@ void MainWindow::setLockStatus() {
     enableFormatActions(!b && c);
     mc_uiLogic->getmdEditor()->setReadOnly(b || !c);
     mc_uiLogic->getListWidget()->setDragEnabled(!b && c);
+    m_editorSplitter->setHandleWidth(4);
     if (b) m_editorSplitter->setSizes({1, 0});
     else m_editorSplitter->setSizes({1, 1});
+    auto *handle = m_editorSplitter->handle(1);
+    if (handle) {
+        handle->setVisible(!b);
+        handle->setEnabled(!b);
+    }
+#if defined(Q_OS_MAC)
+    if (b) m_editorSplitter->setHandleWidth(0);
+#endif
 }
 
 void MainWindow::closeEvent(QCloseEvent *e) {
@@ -480,7 +501,6 @@ bool MainWindow::fileOpen() {
             QDialog::DialogCode answer = pwd->Execute(GET);
             delete pwd;
             if (answer != QDialog::Accepted) return false;
-            m_statusBar->showMessage(tr("Loading and decrypting ...."), MsgDisplayTime);
             QByteArray ba;
             result = m_cipherEngine->decrypt(&ba);
             if (result == MSG_OK) {
@@ -488,6 +508,7 @@ bool MainWindow::fileOpen() {
                 QString title = QString(APPNAME) + " - " + fileInfo.fileName() + PLACEHOLDER;
                 setWindowTitle(title);
                 settingsAfterLoad();
+                m_statusBar->showMessage(tr("File opened in read-only mode."), MsgDisplayTime);
                 return true;
             }
         }

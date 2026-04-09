@@ -3,7 +3,7 @@
 // Purpose:     The main window (header)
 // Author:      Jan Buchholz
 // Created:     2025-10-13
-// Changed:     2026-04-07
+// Changed:     2026-04-08
 /////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -66,7 +66,7 @@ private:
     void settingsAfterEditNote();
     void settingsAfterDeleteNote();
 
-    int const MsgDisplayTime = 3000;
+    int const MsgDisplayTime = 5000;
 
 private slots:
     void onNewFile();
