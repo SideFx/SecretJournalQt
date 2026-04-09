@@ -289,7 +289,6 @@ void MainWindow::setLockStatus() {
     enableFormatActions(!b && c);
     mc_uiLogic->getmdEditor()->setReadOnly(b || !c);
     mc_uiLogic->getListWidget()->setDragEnabled(!b && c);
-    m_editorSplitter->setHandleWidth(4);
     if (b) m_editorSplitter->setSizes({1, 0});
     else m_editorSplitter->setSizes({1, 1});
     auto *handle = m_editorSplitter->handle(1);
@@ -299,6 +298,7 @@ void MainWindow::setLockStatus() {
     }
 #if defined(Q_OS_MAC)
     if (b) m_editorSplitter->setHandleWidth(0);
+    else m_editorSplitter->setHandleWidth(3);
 #endif
 }
 
