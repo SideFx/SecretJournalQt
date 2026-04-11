@@ -41,3 +41,5 @@ Given that the primary target platforms are Windows and macOS - both universally
 - explicitly set handle width to zero in viewer only mode since hiding the handle completely failed 
 - applying the unified tool-/statusbar setting for macOS also failed (applied a custom stylesheet to the statusbar to match background color with the toolbar)
 
+**2026-04-10:**
+- Completely redesigned the logic to keep editor and viewer in sync
