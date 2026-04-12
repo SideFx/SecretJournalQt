@@ -22,6 +22,7 @@
 #define SET_EDITORFONT "options/editorfont"
 #define SET_LISTFONT "options/listfont"
 #define SET_ICONSIZE "options/iconsize"
+#define SET_BULLETSIDX "options/bulletsindex"
 #define PLACEHOLDER " [*]"
 
 int constexpr MAX_ICONSIZE = 24;

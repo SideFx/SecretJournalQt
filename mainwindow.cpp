@@ -3,7 +3,7 @@
 // Purpose:     The main window
 // Author:      Jan Buchholz
 // Created:     2025-10-13
-// Changed:     2026-04-08
+// Changed:     2026-04-12
 /////////////////////////////////////////////////////////////////////////////
 
 #include "mainwindow.h"
@@ -33,9 +33,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     setUnifiedTitleAndToolBarOnMac(true);
     loadPreferences();
     setConnections();
-    m_synchronizer =new ScrollSynchronizer(mc_uiLogic->getmdViewer(),
-        mc_uiLogic->getmdEditor(), m_editorSplitter);
-    m_synchronizer->setEnabled(true);
     fileNew();
 }
 
@@ -43,11 +40,11 @@ MainWindow::~MainWindow() {
     delete ui;
     delete m_fontComboBox;
     delete m_fontSizeBox;
+    delete m_bulletBox;
     delete m_mainToolBar;
     delete m_mainListToolBar;
     delete m_statusBar;
     delete mc_uiLogic;
-    delete m_editorSplitter;
     delete m_treeSplitter;
     delete m_mainSplitter;
     delete mc_dialogs;
@@ -95,18 +92,14 @@ void MainWindow::createToolBars() {
     m_mainToolBar->addAction(ui->mainEditUndo);
     m_mainToolBar->addAction(ui->mainEditRedo);
     m_mainToolBar->addSeparator();
-    m_mainToolBar->addAction(ui->mainEditFormatBold);
-    m_mainToolBar->addAction(ui->mainEditFormatItalic);
-    m_mainToolBar->addAction(ui->mainEditFormatStrikethrough);
-    m_mainToolBar->addAction(ui->mainEditFormatCode);
-    m_mainToolBar->addAction(ui->mainEditFormatHighlight);
-    m_mainToolBar->addSeparator();
     m_mainToolBar->addAction(ui->mainToggleLock);
     m_mainToolBar->addSeparator();
     m_mainToolBar->addAction(ui->mainOptionsPassword);
     QWidget* spacerSmall = new QWidget;
     spacerSmall->setMinimumWidth(25);
     m_mainToolBar->addWidget(spacerSmall);
+    m_bulletBox = new QComboBox;
+    m_bulletBox->addItems(bulletList);
     m_fontComboBox = new QFontComboBox;
     m_fontComboBox->setFontFilters(QFontComboBox::ScalableFonts);
     m_fontComboBox->setWritingSystem(QFontDatabase::Latin);
@@ -114,6 +107,9 @@ void MainWindow::createToolBars() {
     m_fontSizeBox = new QComboBox;
     m_fontSizeBox->addItems(fontSizeList);
     m_mainToolBar->addWidget(m_fontSizeBox);
+    m_mainToolBar->addSeparator();
+    m_mainToolBar->addWidget(m_bulletBox);
+    m_mainToolBar->addAction(ui->mainEditInsert);
     QWidget* spacerLarge = new QWidget;
     spacerLarge->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_mainToolBar->addWidget(spacerLarge);
@@ -132,12 +128,7 @@ void MainWindow::createSplitters() {
     m_treeSplitter->addWidget(m_mainListToolBar);
     m_treeSplitter->addWidget(mc_uiLogic->getListWidget());
     m_mainSplitter->addWidget(m_treeSplitter);
-    m_editorSplitter = new QSplitter;
-    m_editorSplitter->setObjectName("editorSplitter");
-    m_editorSplitter->setOrientation(Qt::Vertical);
-    m_editorSplitter->addWidget(mc_uiLogic->getmdViewer());
-    m_editorSplitter->addWidget(mc_uiLogic->getmdEditor());
-    m_mainSplitter->addWidget(m_editorSplitter);
+    m_mainSplitter->addWidget(mc_uiLogic->getEditor());
     m_mainSplitter->setChildrenCollapsible(false);
     auto *handle = m_treeSplitter->handle(1);
     if (handle) {
@@ -146,7 +137,6 @@ void MainWindow::createSplitters() {
     }
 #if defined(Q_OS_MAC)
     m_mainSplitter->setStyleSheet(styleSplitterHandle);
-    m_editorSplitter->setStyleSheet(styleSplitterHandle);
 #endif
 }
 
@@ -174,11 +164,7 @@ void MainWindow::populateMainMenu() {
     ui->menuEdit->addAction(ui->mainEditUndo);
     ui->menuEdit->addAction(ui->mainEditRedo);
     ui->menuEdit->addSeparator();
-    ui->menuEdit->addAction(ui->mainEditFormatBold);
-    ui->menuEdit->addAction(ui->mainEditFormatItalic);
-    ui->menuEdit->addAction(ui->mainEditFormatStrikethrough);
-    ui->menuEdit->addAction(ui->mainEditFormatCode);
-    ui->menuEdit->addAction(ui->mainEditFormatHighlight);
+    ui->menuEdit->addAction(ui->mainEditInsert);
     ui->menuEdit->addSeparator();
     ui->menuEdit->addAction(ui->listAddNote);
     ui->menuEdit->addAction(ui->listEditNote);
@@ -202,11 +188,7 @@ void MainWindow::setConnections() {
     connect(ui->mainEditSelectAll, &QAction::triggered, this, &MainWindow::onEditSelectAll);
     connect(ui->mainEditUndo, &QAction::triggered, this, &MainWindow::onEditUndo);
     connect(ui->mainEditRedo, &QAction::triggered, this, &MainWindow::onEditRedo);
-    connect(ui->mainEditFormatBold, &QAction::triggered, this, &MainWindow::onEditFormat);
-    connect(ui->mainEditFormatItalic, &QAction::triggered, this, &MainWindow::onEditFormat);
-    connect(ui->mainEditFormatStrikethrough, &QAction::triggered, this, &MainWindow::onEditFormat);
-    connect(ui->mainEditFormatCode, &QAction::triggered, this, &MainWindow::onEditFormat);
-    connect(ui->mainEditFormatHighlight, &QAction::triggered, this, &MainWindow::onEditFormat);
+    connect(ui->mainEditInsert, &QAction::triggered, this, &MainWindow::onEditInsert);
     connect(ui->mainToggleLock, &QAction::triggered, this, &MainWindow::onToggleLock);
     connect(ui->mainOptionsPassword, &QAction::triggered, this, &MainWindow::onOptionsPassword);
     connect(ui->mainAppInfo, &QAction::triggered, this, &MainWindow::onAppInfo);
@@ -217,8 +199,8 @@ void MainWindow::setConnections() {
     connect(ui->listEditNote, &QAction::triggered, this, &MainWindow::onEditNote);
     connect(ui->listDeleteNote, &QAction::triggered, this, &MainWindow::onDeleteNote);
     connect(ui->listSettings, &QAction::triggered, this, &MainWindow::onListSettings);
-    connect(mc_uiLogic->getmdViewer(), &QTextEdit::textChanged, this, &MainWindow::onTextChanged);
     connect(mc_uiLogic, &UILogic::listChanged, this, &MainWindow::onListChanged);
+    connect(mc_uiLogic->getEditor(), &QTextEdit::textChanged, this, &MainWindow::onTextChanged);
 }
 
 void MainWindow::savePreferences() {
@@ -227,10 +209,11 @@ void MainWindow::savePreferences() {
     prefs->PushArray(SET_WSTATE, saveState(0));
     prefs->PushArray(SET_SSTATE, m_mainSplitter->saveState());
     prefs->PushString(SET_LASTFOLDER, m_lastFolder);
-    prefs->PushFont(SET_EDITORFONT, mc_uiLogic->getmdViewer()->font());
+    prefs->PushFont(SET_EDITORFONT, mc_uiLogic->getEditor()->font());
     prefs->PushFont(SET_LISTFONT, mc_uiLogic->getListWidget()->font());
     quint64 iconSize = mc_uiLogic->getListWidget()->iconSize().width();
     prefs->PushNumber(SET_ICONSIZE, iconSize);
+    prefs->PushNumber(SET_BULLETSIDX, m_bulletBox->currentIndex());
     prefs->SavePreferencesToDefaultLocation(SET_COMPANY, APPNAME);
     delete prefs;
 }
@@ -248,8 +231,7 @@ void MainWindow::loadPreferences() {
                 m_fontComboBox->setCurrentFont(efont);
                 QString esize = QString::number(efont.pointSize());
                 if (fontSizeList.indexOf(esize) >= 0) m_fontSizeBox->setCurrentText(esize);
-                mc_uiLogic->getmdViewer()->setFont(efont);
-                mc_uiLogic->getmdEditor()->setFont(efont);
+                mc_uiLogic->getEditor()->setFont(efont);
             }
             QFont lFont = prefs->PopFont(SET_LISTFONT);
             if (!lFont.family().isEmpty()) {
@@ -258,6 +240,8 @@ void MainWindow::loadPreferences() {
             quint64 iconSize = prefs->PopNumber(SET_ICONSIZE);
             if (iconSize < MIN_ICONSIZE || iconSize > MAX_ICONSIZE) iconSize = DEF_ICONSIZE;
             mc_uiLogic->getListWidget()->setIconSize(QSize(iconSize, iconSize));
+            quint64 bulletsidx = prefs->PopNumber(SET_BULLETSIDX);
+            if (bulletsidx < m_bulletBox->count()) m_bulletBox->setCurrentIndex(bulletsidx);
         }
         catch (...) {}
     }
@@ -286,20 +270,9 @@ void MainWindow::setLockStatus() {
     ui->mainEditPaste->setEnabled(!b && c);
     ui->mainEditUndo->setEnabled(!b && c);
     ui->mainEditRedo->setEnabled(!b && c);
-    enableFormatActions(!b && c);
-    mc_uiLogic->getmdEditor()->setReadOnly(b || !c);
+    ui->mainEditInsert->setEnabled(!b && c);
+    mc_uiLogic->getEditor()->setReadOnly(b || !c);
     mc_uiLogic->getListWidget()->setDragEnabled(!b && c);
-    if (b) m_editorSplitter->setSizes({1, 0});
-    else m_editorSplitter->setSizes({1, 1});
-    auto *handle = m_editorSplitter->handle(1);
-    if (handle) {
-        handle->setVisible(!b);
-        handle->setEnabled(!b);
-    }
-#if defined(Q_OS_MAC)
-    if (b) m_editorSplitter->setHandleWidth(0);
-    else m_editorSplitter->setHandleWidth(3);
-#endif
 }
 
 void MainWindow::closeEvent(QCloseEvent *e) {
@@ -331,46 +304,16 @@ void MainWindow::onCurrentFontChanged(const QFont font) {
     if (!f.family().isEmpty()) {
         int s = m_fontSizeBox->currentText().toInt();
         f.setPointSize(s);
-        mc_uiLogic->getmdViewer()->setFont(f);
-        mc_uiLogic->getmdEditor()->setFont(f);
+        mc_uiLogic->getEditor()->setFont(f);
     }
 }
 
 // font size combobox
 void MainWindow::onCurrentTextChanged(const QString size) {
     int s = size.toInt();
-    QFont font = mc_uiLogic->getmdViewer()->font();
+    QFont font = mc_uiLogic->getEditor()->font();
     font.setPointSize(s);
-    mc_uiLogic->getmdViewer()->setFont(font);
-    mc_uiLogic->getmdEditor()->setFont(font);
-}
-
-void MainWindow::onEditFormat() {
-    QTextCursor cursor = mc_uiLogic->getmdEditor()->textCursor();
-    if (cursor.hasSelection()) {
-        int s_begin = cursor.selectionStart();
-        int s_end = cursor.selectionEnd();
-        QAction* action = qobject_cast<QAction*>(sender());
-        if (!action) return;
-        QString format{};
-        if (action == ui->mainEditFormatBold) {
-            format = "**";
-        } else if (action == ui->mainEditFormatItalic) {
-            format = "*";
-        } else if (action == ui->mainEditFormatStrikethrough) {
-            format = "~";
-        } else if (action == ui->mainEditFormatCode) {
-            format = "`";
-        } else if (action == ui->mainEditFormatHighlight) {
-            format = "==";
-        }
-        if (!format.isEmpty()) {
-            cursor.setPosition(s_end, QTextCursor::MoveAnchor);
-            cursor.insertText(format);
-            cursor.setPosition(s_begin, QTextCursor::MoveAnchor);
-            cursor.insertText(format);
-        }
-    }
+    mc_uiLogic->getEditor()->setFont(font);
 }
 
 void MainWindow::onNewFile() {
@@ -401,29 +344,36 @@ void MainWindow::onSaveFileAs() {
 }
 
 void MainWindow::onEditCopy() {
-    mc_uiLogic->getmdEditor()->copy();
+    mc_uiLogic->getEditor()->copy();
 }
 
 void MainWindow::onEditCut() {
-    if (!mc_uiLogic->getmdEditor()->isReadOnly()) mc_uiLogic->getmdEditor()->cut();
+    if (!mc_uiLogic->getEditor()->isReadOnly()) mc_uiLogic->getEditor()->cut();
 }
 
 void MainWindow::onEditPaste() {
-    if (mc_uiLogic->getmdEditor()->canPaste() && !mc_uiLogic->getmdEditor()->isReadOnly()) {
-        mc_uiLogic->getmdEditor()->paste();
+    if (mc_uiLogic->getEditor()->canPaste() && !mc_uiLogic->getEditor()->isReadOnly()) {
+        mc_uiLogic->getEditor()->paste();
     }
 }
 
 void MainWindow::onEditSelectAll() {
-    mc_uiLogic->getmdEditor()->selectAll();
+    mc_uiLogic->getEditor()->selectAll();
 }
 
 void MainWindow::onEditUndo() {
-    if (!mc_uiLogic->getmdEditor()->isReadOnly()) mc_uiLogic->getmdEditor()->undo();
+    if (!mc_uiLogic->getEditor()->isReadOnly()) mc_uiLogic->getEditor()->undo();
 }
 
 void MainWindow::onEditRedo() {
-    if (!mc_uiLogic->getmdEditor()->isReadOnly()) mc_uiLogic->getmdEditor()->redo();
+    if (!mc_uiLogic->getEditor()->isReadOnly()) mc_uiLogic->getEditor()->redo();
+}
+
+void MainWindow::onEditInsert() {
+    if (m_bulletBox->count() > 0) {
+        QString bullet = m_bulletBox->currentText();
+        mc_uiLogic->getEditor()->insertPlainText(bullet);
+    }
 }
 
 void MainWindow::onToggleLock() {
@@ -538,7 +488,6 @@ bool MainWindow::fileSave(bool saveAs) { //saveAs default false
     }
     int result = m_cipherEngine->encrytAndSave(fName, ba);
     if (result == MSG_OK) {
-        mc_uiLogic->refreshDocument(m_lastFolder);
         QString title = QString(APPNAME) + " - " + m_fileName + PLACEHOLDER;
         setWindowTitle(title);
         setWindowModified(false);
@@ -549,21 +498,14 @@ bool MainWindow::fileSave(bool saveAs) { //saveAs default false
     return false;
 }
 
-void MainWindow::enableFormatActions(bool enabled) {
-    ui->mainEditFormatBold->setEnabled(enabled);
-    ui->mainEditFormatItalic->setEnabled(enabled);
-    ui->mainEditFormatStrikethrough->setEnabled(enabled);
-    ui->mainEditFormatCode->setEnabled(enabled);
-    ui->mainEditFormatHighlight->setEnabled(enabled);
-}
-
 void MainWindow::settingsAfterLoad() {
     //enable save, set locked, enable lock, set readonly
     ui->mainSaveFile->setEnabled(true);
     ui->mainSaveFileAs->setEnabled(true);
     ui->mainToggleLock->setChecked(true);
+    ui->mainToggleLock->setEnabled(true);
     setLockStatus();
-    mc_uiLogic->getmdEditor()->setReadOnly(true);
+    mc_uiLogic->getEditor()->setReadOnly(true);
     setWindowModified(false);
 }
 
@@ -572,12 +514,12 @@ void MainWindow::settingsAfterNew() {
     ui->mainSaveFile->setEnabled(false);
     ui->mainSaveFileAs->setEnabled(false);
     ui->mainToggleLock->setChecked(false);
-    enableFormatActions(false);
+    ui->mainToggleLock->setEnabled(false);
     setLockStatus();
     ui->listEditNote->setEnabled(false);
     ui->listDeleteNote->setEnabled(false);
     //user must add new note first!
-    mc_uiLogic->getmdEditor()->setReadOnly(true);
+    mc_uiLogic->getEditor()->setReadOnly(true);
     QString title = QString(APPNAME) + " - " + mc_dialogs->UNTITLED_DOCUMENT + PLACEHOLDER;
     setWindowTitle(title);
     setWindowModified(false);
@@ -588,11 +530,11 @@ void MainWindow::settingsAfterAddNote() {
     ui->mainSaveFile->setEnabled(true);
     ui->mainSaveFileAs->setEnabled(true);
     ui->mainToggleLock->setChecked(false);
-    enableFormatActions(true);
+    ui->mainToggleLock->setEnabled(true);
     setLockStatus();
     ui->listEditNote->setEnabled(true);
     ui->listDeleteNote->setEnabled(true);
-    mc_uiLogic->getmdEditor()->setReadOnly(false);
+    mc_uiLogic->getEditor()->setReadOnly(false);
     setWindowModified(true);
 }
 
@@ -602,14 +544,12 @@ void MainWindow::settingsAfterEditNote() {
 
 void MainWindow::settingsAfterDeleteNote() {
     bool b = mc_uiLogic->getItemCount() > 0;
-    if (!b) mc_uiLogic->getmdViewer()->clear(); //no note left, clear text
     setWindowModified(b);
     ui->mainSaveFile->setEnabled(b);
     ui->mainSaveFileAs->setEnabled(b);
     ui->mainToggleLock->setEnabled(b);
     ui->listEditNote->setEnabled(b);
     ui->listDeleteNote->setEnabled(b);
-    enableFormatActions(b);
     bool c = b || ui->mainToggleLock->isChecked();
-    mc_uiLogic->getmdEditor()->setReadOnly(!c);
+    mc_uiLogic->getEditor()->setReadOnly(!c);
 }

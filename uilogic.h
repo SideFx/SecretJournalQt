@@ -3,6 +3,7 @@
 // Purpose:     QListWidget & QTextEdit logic, JSON conversion (header)
 // Author:      Jan Buchholz
 // Created:     2025-10-13
+// Changed:     2026-04-11
 /////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -13,7 +14,6 @@
 #include <QJsonObject>
 #include <QByteArray>
 #include "jblistwidget.h"
-#include "synchelper.h"
 
 class UILogic : public QObject {
     Q_OBJECT
@@ -28,8 +28,7 @@ public:
         QString payload;
     } journalData;
     QListWidget* getListWidget() const {return m_listWidget;}
-    QTextEdit* getmdViewer() const {return m_mdViewer;}
-    QTextEdit* getmdEditor() const {return m_mdEditor;}
+    QTextEdit* getEditor() const {return m_Editor;}
     void resetAll();
     void startUp(const QByteArray ba, QString workDir);
     bool addListItem();
@@ -40,20 +39,16 @@ public:
     void openListSettingsDialog();
     bool isAnyItemSelected();
     int getItemCount();
-    void refreshDocument(QString workDir);
     QByteArray dataToJson();
 
 private:
     JBListWidget *m_listWidget;
-    QTextBrowser *m_mdViewer;
-    QTextEdit *m_mdEditor;
+    QTextEdit *m_Editor;
     QVector<journalData> m_data;
-    SyncHelper *mc_synchelper;
     int m_id;
     bool m_textChangeIgnore;
     void createListWidget();
-    void createMdViewer();
-    void createMdEditor();
+    void createEditor();
     void setPayload(int id, QString payload);
     QString getPayLoad(int id);
     void jsonToData(QByteArray ba);
@@ -63,7 +58,6 @@ private:
 private slots:
     void onCurrentItemChanged(QListWidgetItem*, QListWidgetItem*);
     void onJBListDropEvent();
-    void onTextChanged();
 
 signals:
     void listChanged();

@@ -3,7 +3,7 @@
 // Purpose:     The main window (header)
 // Author:      Jan Buchholz
 // Created:     2025-10-13
-// Changed:     2026-04-05
+// Changed:     2026-04-11
 /////////////////////////////////////////////////////////////////////////////
 
 #include "uilogic.h"
@@ -15,26 +15,20 @@
 
 UILogic::UILogic(QObject *parent) : QObject{parent} {
     createListWidget();
-    createMdViewer();
-    createMdEditor();
-    mc_synchelper = new SyncHelper(m_mdEditor, m_mdViewer);
+    createEditor();
     resetAll();
     connect(m_listWidget, &JBListWidget::currentItemChanged, this, &UILogic::onCurrentItemChanged);
     connect(m_listWidget, &JBListWidget::dropEventAccepted, this, &UILogic::onJBListDropEvent);
-    connect(m_mdEditor, &QTextEdit::textChanged, this, &UILogic::onTextChanged);
 }
 
 UILogic::~UILogic() {
     delete m_listWidget;
-    delete mc_synchelper;
-    delete m_mdViewer;
-    delete m_mdEditor;
+    delete m_Editor;
 }
 
 void UILogic::startUp(const QByteArray ba, QString workDir) {
     resetAll();
     if (ba.isEmpty()) return;
-    mc_synchelper->setDocumentPath(workDir);
     jsonToData(ba);
     IconList *iconList = new IconList();
     for (auto &j : m_data) {
@@ -46,15 +40,13 @@ void UILogic::startUp(const QByteArray ba, QString workDir) {
         QListWidgetItem *item = m_listWidget->item(0);
         m_listWidget->setCurrentItem(item);
     }
-    m_mdViewer->setFocus();
+    m_Editor->setFocus();
 }
 
 void UILogic::resetAll() {
     m_listWidget->clear();
-    m_mdViewer->clear();
-    m_mdEditor->clear();
+    m_Editor->clear();
     m_data.clear();
-    mc_synchelper->invalidateImageCache();
     m_id = QListWidgetItem::UserType;
 }
 
@@ -72,21 +64,13 @@ void UILogic::createListWidget(){
     m_listWidget->setDefaultDropAction(Qt::MoveAction);
 }
 
-void UILogic::createMdViewer() {
-    m_mdViewer = new QTextBrowser();
-    m_mdViewer->setWordWrapMode(QTextOption::WordWrap);
-    m_mdViewer->setLineWrapMode(QTextEdit::WidgetWidth);
-    m_mdViewer->setAcceptRichText(false);
-    m_mdViewer->setOpenExternalLinks(true);
-}
-
-void UILogic::createMdEditor() {
-    m_mdEditor = new QTextEdit();
-    m_mdEditor->setAcceptRichText(false);
-    m_mdEditor->setWordWrapMode(QTextOption::WordWrap);
-    m_mdEditor->setLineWrapMode(QTextEdit::WidgetWidth);
-    m_mdEditor->setOverwriteMode(false);
-    m_mdEditor->setUndoRedoEnabled(true);
+void UILogic::createEditor() {
+    m_Editor = new QTextEdit();
+    m_Editor->setAcceptRichText(false);
+    m_Editor->setWordWrapMode(QTextOption::WordWrap);
+    m_Editor->setLineWrapMode(QTextEdit::WidgetWidth);
+    m_Editor->setOverwriteMode(false);
+    m_Editor->setUndoRedoEnabled(true);
 }
 
 bool UILogic::addListItem() {
@@ -105,9 +89,8 @@ bool UILogic::addListItem() {
         m_listWidget->setCurrentItem(item);
         m_data.append(data);
         delete iconList;
-        m_mdViewer->clear();
-        m_mdEditor->clear();
-        m_mdEditor->setFocus();
+        m_Editor->clear();
+        m_Editor->setFocus();
         b = true;
     }
     delete dlg;
@@ -163,8 +146,7 @@ bool UILogic::deleteListItem(){
         QListWidgetItem *item_c = m_listWidget->item(0);
         m_listWidget->setCurrentItem(item_c);
     } else {
-        m_mdViewer->clear();
-        m_mdEditor->clear();
+        m_Editor->clear();
     }
     return true;
 }
@@ -218,7 +200,7 @@ QByteArray UILogic::dataToJson() {
     QJsonArray array = {};
     QList<QListWidgetItem*> itemList = m_listWidget->selectedItems();
     if (!itemList.empty()) {
-        setPayload(itemList[0]->type(), m_mdEditor->toPlainText());
+        setPayload(itemList[0]->type(), m_Editor->toPlainText());
     }
     for (int i = 0; i < m_listWidget->count(); i++) {
         QListWidgetItem* item = m_listWidget->item(i);
@@ -255,11 +237,6 @@ int UILogic::getItemCount() {
     return m_listWidget->count();
 }
 
-void UILogic::refreshDocument(QString workDir) {
-    mc_synchelper->setDocumentPath(workDir);
-    mc_synchelper->refreshDocument();
-}
-
 void UILogic::openListSettingsDialog() {
     ListFontDialog *dlg = new ListFontDialog();
     QFont font = m_listWidget->font();
@@ -271,21 +248,16 @@ void UILogic::openListSettingsDialog() {
     delete dlg;
 }
 
-void UILogic::onTextChanged() {
-    mc_synchelper->syncToViewer();
-    m_mdEditor->setFocus();
-}
-
 void UILogic::onCurrentItemChanged(QListWidgetItem *current, QListWidgetItem *previous) {
     if (previous) {
-        setPayload(previous->type(), m_mdEditor->toPlainText());
+        setPayload(previous->type(), m_Editor->toPlainText());
     }
     if (current) {
         m_textChangeIgnore = true;
         QString md = getPayLoad(current->type());
-        m_mdEditor->setPlainText(md);
+        m_Editor->setPlainText(md);
         m_textChangeIgnore = false;
-        m_mdEditor->setFocus();
+        m_Editor->setFocus();
     }
 }
 

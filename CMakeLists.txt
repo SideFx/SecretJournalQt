@@ -21,7 +21,6 @@ set(PROJECT_SOURCES
         mainwindow.h
         mainwindow.ui
 )
-add_subdirectory("${CMAKE_SOURCE_DIR}/md4c")
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 find_package(Qt6 REQUIRED COMPONENTS Core Widgets Network Svg)
@@ -63,9 +62,8 @@ endif()
         assets/Journal.png
         aboutdialog.h aboutdialog.cpp aboutdialog.ui
         assets/mainTB_Export.svg
-        scrollsynchronizer.h scrollsynchronizer.cpp
+        
         LICENSE.md
-        imagehandler.cpp imagehandler.h synchelper.cpp synchelper.h
         assets/mainTB_FormatBold.svg assets/mainTB_FormatCode.svg assets/mainTB_FormatHighlight.svg assets/mainTB_FormatItalic.svg assets/mainTB_FormatStrikethrough.svg assets/mainTB_FormatUnderlined.svg
         passworddialog.ui
         passworddialog.h
@@ -78,12 +76,12 @@ endif()
 
 
         jbcrypto/jbhmac.h jbcrypto/jbhmac.cpp
+        assets/mainTB_Insert.svg
     )
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets Qt6::Network Qt6::Svg)
-target_link_libraries(${PROJECT_NAME} PRIVATE md4c md4c-html)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     ${BUNDLE_ID_OPTION}
