@@ -23,6 +23,7 @@
 #define SET_LISTFONT "options/listfont"
 #define SET_ICONSIZE "options/iconsize"
 #define SET_BULLETSIDX "options/bulletsindex"
+#define SET_TABOPTION "options/tab"
 #define PLACEHOLDER " [*]"
 
 int constexpr MAX_ICONSIZE = 24;

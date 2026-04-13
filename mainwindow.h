@@ -3,7 +3,7 @@
 // Purpose:     The main window (header)
 // Author:      Jan Buchholz
 // Created:     2025-10-13
-// Changed:     2026-04-12
+// Changed:     2026-04-13
 /////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -40,6 +40,7 @@ private:
     QSplitter *m_mainSplitter, *m_treeSplitter;
     QFontComboBox *m_fontComboBox;
     QComboBox *m_fontSizeBox, *m_bulletBox;
+    QCheckBox *m_tabBox;
     UILogic *mc_uiLogic;
     QString m_lastFolder;
     QString m_fileName;

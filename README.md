@@ -36,3 +36,6 @@ Given that the primary target platforms are Windows and macOS - both universally
 
 **2026-04-12:**
 - Added a dropdown list to insert bullets into the text
+
+**2026-04-13:**
+- New option to insert tab before bullet

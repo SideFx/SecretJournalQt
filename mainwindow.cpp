@@ -3,7 +3,7 @@
 // Purpose:     The main window
 // Author:      Jan Buchholz
 // Created:     2025-10-13
-// Changed:     2026-04-12
+// Changed:     2026-04-13
 /////////////////////////////////////////////////////////////////////////////
 
 #include "mainwindow.h"
@@ -41,6 +41,7 @@ MainWindow::~MainWindow() {
     delete m_fontComboBox;
     delete m_fontSizeBox;
     delete m_bulletBox;
+    delete m_tabBox;
     delete m_mainToolBar;
     delete m_mainListToolBar;
     delete m_statusBar;
@@ -98,16 +99,24 @@ void MainWindow::createToolBars() {
     QWidget* spacerSmall = new QWidget;
     spacerSmall->setMinimumWidth(25);
     m_mainToolBar->addWidget(spacerSmall);
-    m_bulletBox = new QComboBox;
-    m_bulletBox->addItems(bulletList);
     m_fontComboBox = new QFontComboBox;
     m_fontComboBox->setFontFilters(QFontComboBox::ScalableFonts);
     m_fontComboBox->setWritingSystem(QFontDatabase::Latin);
+    m_fontComboBox->setToolTip(tr("Select editor font"));
     m_mainToolBar->addWidget(m_fontComboBox);
     m_fontSizeBox = new QComboBox;
     m_fontSizeBox->addItems(fontSizeList);
+    m_fontSizeBox->setToolTip(tr("Select editor font size"));
     m_mainToolBar->addWidget(m_fontSizeBox);
     m_mainToolBar->addSeparator();
+    m_tabBox = new QCheckBox;
+    m_tabBox->setText(tr("Tab +"));
+    m_tabBox->setToolTip(tr("Insert tab before bullet"));
+    m_tabBox->setTristate(false);
+    m_mainToolBar->addWidget(m_tabBox);
+    m_bulletBox = new QComboBox;
+    m_bulletBox->addItems(bulletList);
+    m_bulletBox->setToolTip(tr("Select bullet"));
     m_mainToolBar->addWidget(m_bulletBox);
     m_mainToolBar->addAction(ui->mainEditInsert);
     QWidget* spacerLarge = new QWidget;
@@ -214,6 +223,7 @@ void MainWindow::savePreferences() {
     quint64 iconSize = mc_uiLogic->getListWidget()->iconSize().width();
     prefs->PushNumber(SET_ICONSIZE, iconSize);
     prefs->PushNumber(SET_BULLETSIDX, m_bulletBox->currentIndex());
+    prefs->PushBoolean(SET_TABOPTION, m_tabBox->checkState() == Qt::Checked);
     prefs->SavePreferencesToDefaultLocation(SET_COMPANY, APPNAME);
     delete prefs;
 }
@@ -242,6 +252,8 @@ void MainWindow::loadPreferences() {
             mc_uiLogic->getListWidget()->setIconSize(QSize(iconSize, iconSize));
             quint64 bulletsidx = prefs->PopNumber(SET_BULLETSIDX);
             if (bulletsidx < m_bulletBox->count()) m_bulletBox->setCurrentIndex(bulletsidx);
+            bool b = prefs->PopBoolean(SET_TABOPTION);
+            if (b) m_tabBox->setCheckState(Qt::Checked); else m_tabBox->setCheckState(Qt::Unchecked);
         }
         catch (...) {}
     }
@@ -371,7 +383,8 @@ void MainWindow::onEditRedo() {
 
 void MainWindow::onEditInsert() {
     if (m_bulletBox->count() > 0) {
-        QString bullet = m_bulletBox->currentText();
+        QString bullet = m_bulletBox->currentText() + " ";
+        if (m_tabBox->checkState() == Qt::Checked) bullet = "\t" + bullet;
         mc_uiLogic->getEditor()->insertPlainText(bullet);
     }
 }
