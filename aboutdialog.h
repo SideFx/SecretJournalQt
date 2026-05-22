@@ -24,11 +24,9 @@ public:
 
 private:
     Ui::AboutDialog *ui;
-    QString TxtAboutJournal = QString(tr("SecretJournalQt v") + APPVERSION +
+    QString TxtAboutJournal = QString(tr("SecretJournalQt v") + APPVERSION + "\n" +
     tr(" (w) 2026 Jan Buchholz\n\u2022\u2022\u2022\n")) +
-    tr("Created with Qt Community Edition v") + qVersion() + tr(" (https://www.qt.io).") +
-    tr("\n\u2022\u2022\u2022\nThanks to Martin Mitáš (mity)\n") +
-    tr("and all contributors to the \"md4c\" library:\nhttps://github.com/mity/md4c");
+    tr("Created with Qt Community Edition v") + qVersion() + tr(" (https://www.qt.io).");
 };
 
 
