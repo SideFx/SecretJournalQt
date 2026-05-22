@@ -3,7 +3,7 @@
 // Purpose:     The main window
 // Author:      Jan Buchholz
 // Created:     2025-10-13
-// Changed:     2026-04-13
+// Changed:     2026-05-22
 /////////////////////////////////////////////////////////////////////////////
 
 #include "mainwindow.h"
@@ -20,7 +20,6 @@
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
-    m_cipherEngine = new CipherEngine();
     mc_uiLogic = new UILogic(this);
     mc_dialogs = new Dialogs(this);
     ui->mainAppInfo->setToolTip(tr("About") + " " + APPNAME);
@@ -38,29 +37,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
 MainWindow::~MainWindow() {
     delete ui;
-    delete m_fontComboBox;
-    delete m_fontSizeBox;
-    delete m_bulletBox;
-    delete m_tabBox;
-    delete m_mainToolBar;
-    delete m_mainListToolBar;
-    delete m_statusBar;
-    delete mc_uiLogic;
-    delete m_treeSplitter;
-    delete m_mainSplitter;
-    delete mc_dialogs;
-    delete m_cipherEngine;
 }
 
 void MainWindow::createToolBars() {
-    m_mainToolBar = new QToolBar;
+    m_mainToolBar = new QToolBar(this);
     m_mainToolBar->setObjectName("mainToolbar");
     m_mainToolBar->setMovable(false);
     m_mainToolBar->setOrientation(Qt::Horizontal);
     m_mainToolBar->setAutoFillBackground(true);
     m_mainToolBar->setIconSize(QSize(DEF_ICONSIZE, DEF_ICONSIZE));
     m_mainToolBar->setFixedHeight(26);
-    m_mainListToolBar = new QToolBar;
+    m_mainListToolBar = new QToolBar(this);
     m_mainListToolBar->setObjectName("treeToolbar");
     m_mainListToolBar->setMovable(false);
     m_mainListToolBar->setOrientation(Qt::Horizontal);
@@ -96,30 +83,30 @@ void MainWindow::createToolBars() {
     m_mainToolBar->addAction(ui->mainToggleLock);
     m_mainToolBar->addSeparator();
     m_mainToolBar->addAction(ui->mainOptionsPassword);
-    QWidget* spacerSmall = new QWidget;
+    QWidget* spacerSmall = new QWidget(this);
     spacerSmall->setMinimumWidth(25);
     m_mainToolBar->addWidget(spacerSmall);
-    m_fontComboBox = new QFontComboBox;
+    m_fontComboBox = new QFontComboBox(this);
     m_fontComboBox->setFontFilters(QFontComboBox::ScalableFonts);
     m_fontComboBox->setWritingSystem(QFontDatabase::Latin);
     m_fontComboBox->setToolTip(tr("Select editor font"));
     m_mainToolBar->addWidget(m_fontComboBox);
-    m_fontSizeBox = new QComboBox;
+    m_fontSizeBox = new QComboBox(this);
     m_fontSizeBox->addItems(fontSizeList);
     m_fontSizeBox->setToolTip(tr("Select editor font size"));
     m_mainToolBar->addWidget(m_fontSizeBox);
     m_mainToolBar->addSeparator();
-    m_tabBox = new QCheckBox;
+    m_tabBox = new QCheckBox(this);
     m_tabBox->setText(tr("Tab +"));
     m_tabBox->setToolTip(tr("Insert tab before bullet"));
     m_tabBox->setTristate(false);
     m_mainToolBar->addWidget(m_tabBox);
-    m_bulletBox = new QComboBox;
+    m_bulletBox = new QComboBox(this);
     m_bulletBox->addItems(bulletList);
     m_bulletBox->setToolTip(tr("Select bullet"));
     m_mainToolBar->addWidget(m_bulletBox);
     m_mainToolBar->addAction(ui->mainEditInsert);
-    QWidget* spacerLarge = new QWidget;
+    QWidget* spacerLarge = new QWidget(this);
     spacerLarge->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_mainToolBar->addWidget(spacerLarge);
     m_mainToolBar->addAction(ui->mainAppInfo);
@@ -127,10 +114,10 @@ void MainWindow::createToolBars() {
 }
 
 void MainWindow::createSplitters() {
-    m_mainSplitter = new QSplitter;
+    m_mainSplitter = new QSplitter(this);
     m_mainSplitter->setObjectName("mainSplitter");
     m_mainSplitter->setOrientation(Qt::Horizontal);
-    m_treeSplitter = new QSplitter;
+    m_treeSplitter = new QSplitter(this);
     m_treeSplitter->setObjectName("treeSplitter");
     m_treeSplitter->setOrientation(Qt::Vertical);
     m_treeSplitter->setHandleWidth(0);
@@ -150,7 +137,7 @@ void MainWindow::createSplitters() {
 }
 
 void MainWindow::createStatusBar() {
-    m_statusBar = new QStatusBar;
+    m_statusBar = new QStatusBar(this);
 #if defined(Q_OS_MAC)
     m_statusBar->setStyleSheet("QStatusBar {background: lightGray;}");
 #endif
@@ -258,7 +245,8 @@ void MainWindow::loadPreferences() {
         catch (...) {}
     }
     delete prefs;
-    if (m_lastFolder.isEmpty()) m_lastFolder = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
+    if (m_lastFolder.isEmpty())
+        m_lastFolder = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
 }
 
 void MainWindow::setLockStatus() {
@@ -394,9 +382,8 @@ void MainWindow::onToggleLock() {
 }
 
 void MainWindow::onOptionsPassword() {
-    PasswordDialog *pass = new PasswordDialog(this, m_cipherEngine);
-    pass->Execute(SET);
-    delete pass;
+    PasswordDialog dlg(this, m_cipherEngine);
+    dlg.Execute(SET);
 }
 
 void MainWindow::onAppInfo() {
@@ -442,7 +429,7 @@ void MainWindow::fileNew() {
     m_fileName.clear();
     mc_uiLogic->resetAll();
     settingsAfterNew();
-    m_cipherEngine->resetVector();
+    m_cipherEngine.resetVector();
 }
 
 bool MainWindow::fileOpen() {
@@ -458,14 +445,13 @@ bool MainWindow::fileOpen() {
         QFileInfo fileInfo(fName);
         m_lastFolder = fileInfo.path();
         m_fileName = fileInfo.fileName();
-        int result = m_cipherEngine->load(fName);
+        int result = m_cipherEngine.load(fName);
         if (result == MSG_OK) {
-            PasswordDialog *pwd = new PasswordDialog(this, m_cipherEngine);
-            QDialog::DialogCode answer = pwd->Execute(GET);
-            delete pwd;
+            PasswordDialog pwd(this, m_cipherEngine);
+            QDialog::DialogCode answer = pwd.Execute(GET);
             if (answer != QDialog::Accepted) return false;
             QByteArray ba;
-            result = m_cipherEngine->decrypt(&ba);
+            result = m_cipherEngine.decrypt(&ba);
             if (result == MSG_OK) {
                 mc_uiLogic->startUp(ba, m_lastFolder);
                 QString title = QString(APPNAME) + " - " + fileInfo.fileName() + PLACEHOLDER;
@@ -493,13 +479,12 @@ bool MainWindow::fileSave(bool saveAs) { //saveAs default false
         fName = fileInfo.absoluteFilePath();
     }
     QByteArray ba = mc_uiLogic->dataToJson();
-    if (!m_cipherEngine->checkIntegrity()) {
-        PasswordDialog *pwd = new PasswordDialog(this, m_cipherEngine);
-        QDialog::DialogCode dlgres = pwd->Execute(SET);
-        delete pwd;
+    if (!m_cipherEngine.checkIntegrity()) {
+        PasswordDialog pwd(this, m_cipherEngine);
+        QDialog::DialogCode dlgres = pwd.Execute(SET);
         if (dlgres != QDialog::Accepted) return false;
     }
-    int result = m_cipherEngine->encrytAndSave(fName, ba);
+    int result = m_cipherEngine.encrytAndSave(fName, ba);
     if (result == MSG_OK) {
         QString title = QString(APPNAME) + " - " + m_fileName + PLACEHOLDER;
         setWindowTitle(title);

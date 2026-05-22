@@ -3,7 +3,7 @@
 // Purpose:     The main window (header)
 // Author:      Jan Buchholz
 // Created:     2025-10-13
-// Changed:     2026-04-11
+// Changed:     2026-05-22
 /////////////////////////////////////////////////////////////////////////////
 
 #include "uilogic.h"
@@ -13,7 +13,8 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 
-UILogic::UILogic(QObject *parent) : QObject{parent} {
+// QObject(parent) <-- super->constructor( parent )
+UILogic::UILogic(QMainWindow *parent) : QObject(parent), m_mainWindow(parent) {
     createListWidget();
     createEditor();
     resetAll();
@@ -21,10 +22,7 @@ UILogic::UILogic(QObject *parent) : QObject{parent} {
     connect(m_listWidget, &JBListWidget::dropEventAccepted, this, &UILogic::onJBListDropEvent);
 }
 
-UILogic::~UILogic() {
-    delete m_listWidget;
-    delete m_Editor;
-}
+UILogic::~UILogic() {}
 
 void UILogic::startUp(const QByteArray ba, QString workDir) {
     resetAll();
@@ -51,7 +49,7 @@ void UILogic::resetAll() {
 }
 
 void UILogic::createListWidget(){
-    m_listWidget = new JBListWidget();
+    m_listWidget = new JBListWidget(m_mainWindow);
     m_listWidget->setMinimumWidth(150);
     m_listWidget->setViewMode(QListView::ListMode);
     m_listWidget->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -65,7 +63,7 @@ void UILogic::createListWidget(){
 }
 
 void UILogic::createEditor() {
-    m_Editor = new QTextEdit();
+    m_Editor = new QTextEdit(m_mainWindow);
     m_Editor->setAcceptRichText(false);
     m_Editor->setWordWrapMode(QTextOption::WordWrap);
     m_Editor->setLineWrapMode(QTextEdit::WidgetWidth);
@@ -75,25 +73,23 @@ void UILogic::createEditor() {
 
 bool UILogic::addListItem() {
     bool b = false;
-    ListItemDialog *dlg = new ListItemDialog();
+    ListItemDialog dlg;
     journalData data = {};
-    if (dlg->Execute(ListItemDialog::create, &data.subject, &data.icon) == QDialog::Accepted) {
+    if (dlg.Execute(ListItemDialog::create, &data.subject, &data.icon) == QDialog::Accepted) {
         m_id++;
         data.id = m_id;
         data.payload.clear();
-        IconList *iconList = new IconList();
+        IconList iconList;
         QListWidgetItem *item = new QListWidgetItem(m_listWidget, data.id);
-        item->setIcon(iconList->getIconAtIndex(data.icon));
+        item->setIcon(iconList.getIconAtIndex(data.icon));
         item->setText(data.subject);
         m_listWidget->addItem(item);
         m_listWidget->setCurrentItem(item);
         m_data.append(data);
-        delete iconList;
         m_Editor->clear();
         m_Editor->setFocus();
         b = true;
     }
-    delete dlg;
     return b;
 }
 
@@ -102,8 +98,8 @@ bool UILogic::editListItem() {
     QList<QListWidgetItem*> itemList = m_listWidget->selectedItems();
     if (itemList.empty()) return changed;
     QListWidgetItem *item = itemList[0];
-    IconList *iconList = new IconList();
-    ListItemDialog *dlg = new ListItemDialog();
+    IconList iconList;
+    ListItemDialog dlg;
     int icon = -1;
     for (auto &p : m_data) {
         if (p.id == item->type()) {
@@ -112,9 +108,9 @@ bool UILogic::editListItem() {
         }
     }
     QString text = item->text();
-    if (dlg->Execute(ListItemDialog::edit, &text, &icon) == QDialog::Accepted) {
+    if (dlg.Execute(ListItemDialog::edit, &text, &icon) == QDialog::Accepted) {
         item->setText(text);
-        item->setIcon(iconList->getIconAtIndex(icon));
+        item->setIcon(iconList.getIconAtIndex(icon));
         for (auto &p : m_data) {
             if (p.id == item->type()) {
                 if (icon != p.icon || text != p.subject) changed = true;
@@ -124,8 +120,6 @@ bool UILogic::editListItem() {
             }
         }
     }
-    delete iconList;
-    delete dlg;
     m_listWidget->setCurrentItem(item);
     return changed;
 }
@@ -238,14 +232,13 @@ int UILogic::getItemCount() {
 }
 
 void UILogic::openListSettingsDialog() {
-    ListFontDialog *dlg = new ListFontDialog();
+    ListFontDialog dlg;
     QFont font = m_listWidget->font();
     int iconSize = m_listWidget->iconSize().width();
-    if (dlg->Execute(&font, &iconSize) == QDialog::Accepted) {
+    if (dlg.Execute(&font, &iconSize) == QDialog::Accepted) {
         m_listWidget->setFont(font);
         m_listWidget->setIconSize(QSize(iconSize, iconSize));
     }
-    delete dlg;
 }
 
 void UILogic::onCurrentItemChanged(QListWidgetItem *current, QListWidgetItem *previous) {

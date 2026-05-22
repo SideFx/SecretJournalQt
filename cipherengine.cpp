@@ -3,7 +3,7 @@
 // Purpose:     Cryptographic engine
 // Author:      Jan Buchholz
 // Created:     2026-04-03
-// Changed:     2026-04-06
+// Changed:     2026-05-22
 /////////////////////////////////////////////////////////////////////////////
 
 #include "cipherengine.h"
@@ -12,6 +12,18 @@
 #include "jbcrypto/jbtwofish.h"
 #include "io.h"
 #include <random>
+
+CipherEngine::CipherEngine() {
+    m_iv.set = false;
+    m_iv.iter = 0;
+    m_iv.iv.clear();
+    m_iv.salt.clear();
+    m_iv.pass_key.clear();
+    m_iv.hmac_key.clear();
+    m_iv.hmac.clear();
+    m_iv.ciphertextlen = 0;
+    m_iv.ciphertext.clear();
+}
 
 void CipherEngine::initializeVector(const std::vector<uint8_t>& passphrase, behavior mode) {
     if (mode == SET) {

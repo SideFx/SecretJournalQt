@@ -3,7 +3,7 @@
 // Purpose:     Constants and text snippets
 // Author:      Jan Buchholz
 // Created:     2025-10-13
-// Changed:     2026-04-06
+// Changed:     2026-05-22
 /////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -12,6 +12,7 @@
 #include <QStringList>
 
 #define APPNAME "SecretJournalQt"
+#define APPVERSION "1.1"
 #define APP_FOLDER "SecretJournalQt"
 #define SET_COMPANY "org.jan.buchholz"
 #define SET_WGEOMETRY "mainwindow/geometry"

@@ -3,7 +3,7 @@
 // Purpose:     Cryptographic engine (header)
 // Author:      Jan Buchholz
 // Created:     2026-04-03
-// Changed:     2026-04-06
+// Changed:     2026-05-22
 /////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -16,6 +16,7 @@
 class CipherEngine {
 
 public:
+    CipherEngine();
     void initializeVector(const std::vector<uint8_t>& passphrase, behavior mode);
     bool checkIntegrity();
     bool cipher(const std::vector<uint8_t>& plainText);

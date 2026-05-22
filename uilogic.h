@@ -3,7 +3,7 @@
 // Purpose:     QListWidget & QTextEdit logic, JSON conversion (header)
 // Author:      Jan Buchholz
 // Created:     2025-10-13
-// Changed:     2026-04-11
+// Changed:     2026-05-22
 /////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -13,13 +13,14 @@
 #include <QTextBrowser>
 #include <QJsonObject>
 #include <QByteArray>
+#include <QMainWindow>
 #include "jblistwidget.h"
 
 class UILogic : public QObject {
     Q_OBJECT
 
 public:
-    explicit UILogic(QObject *parent = nullptr);
+    explicit UILogic(QMainWindow *parent);
     ~UILogic();
     typedef struct {
         int id;
@@ -42,8 +43,9 @@ public:
     QByteArray dataToJson();
 
 private:
-    JBListWidget *m_listWidget;
-    QTextEdit *m_Editor;
+    QMainWindow* m_mainWindow;
+    JBListWidget* m_listWidget;
+    QTextEdit* m_Editor;
     QVector<journalData> m_data;
     int m_id;
     bool m_textChangeIgnore;

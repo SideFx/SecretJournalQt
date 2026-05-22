@@ -33,51 +33,41 @@ set_source_files_properties(${APP_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Reso
 endif()
 
     qt_add_executable(${PROJECT_NAME}
+        WIN32 MACOSX_BUNDLE
         MANUAL_FINALIZATION
-        ${PROJECT_SOURCES}
+        main.cpp
+        mainwindow.cpp
+        mainwindow.h
+        mainwindow.ui
         stylesheets.h
         constants.h
         jbpreferences.cpp jbpreferences.h
-        assets/mainTB_Unlocked.svg assets/mainTB_Font.svg assets/mainTB_Open.svg assets/mainTB_Quit.svg assets/mainTB_Save.svg assets/mainTB_SaveAs.svg assets/treeTB_CollapseAll.svg assets/treeTB_CreateFolder.svg assets/treeTB_CreateNote.svg assets/treeTB_Delete.svg assets/treeTB_ExpandAll.svg
-        assets/mainTB_Locked.svg
         resources.qrc
-        assets/mainTB_New.svg
-        assets/mainTB_Copy.svg assets/mainTB_Cut.svg assets/mainTB_Paste.svg assets/mainTB_Redo.svg assets/mainTB_SelectAll.svg assets/mainTB_Undo.svg
-        assets/mainTB_Info.svg
-        assets/mainTB_Settings.svg
         dialogs.h dialogs.cpp
         uilogic.h uilogic.cpp
         jblistwidget.h jblistwidget.cpp
-        assets/mainTB_Quit_2.svg
-        assets/list_Article.svg assets/list_Bookmarks.svg assets/list_Calendar.svg assets/list_Contacts.svg assets/list_DataTable.svg assets/list_Drafts.svg assets/list_Favorite.svg assets/list_Folder.svg assets/list_Label.svg assets/list_Library.svg assets/list_Objects.svg assets/list_Pin.svg assets/list_Smiley.svg assets/list_Support.svg assets/list_Work.svg
         listfontdialog.h listfontdialog.cpp listfontdialog.ui
-        assets/mainTB_Edit.svg
-        assets/mainTB_Edit_2.svg
-        assets/mainTB_Key.svg
         listitemdialog.h listitemdialog.cpp listitemdialog.ui
         iconlist.h iconlist.cpp
         app.icns app.ico appicon.rc
         appicon.rc
         io.h io.cpp
-        assets/Journal.png
         aboutdialog.h aboutdialog.cpp aboutdialog.ui
-        assets/mainTB_Export.svg
-        
-        LICENSE.md
-        assets/mainTB_FormatBold.svg assets/mainTB_FormatCode.svg assets/mainTB_FormatHighlight.svg assets/mainTB_FormatItalic.svg assets/mainTB_FormatStrikethrough.svg assets/mainTB_FormatUnderlined.svg
         passworddialog.ui
         passworddialog.h
         passworddialog.cpp
         cipherengine.h cipherengine.cpp
         jbcrypto/jbcommon.hpp jbcrypto/jbsha.cpp jbcrypto/jbsha.h
-
         jbcrypto/jbtwofish.h jbcrypto/jbtwofish.cpp
         jbcrypto/jbselftest.h jbcrypto/jbselftest.cpp
-
-
         jbcrypto/jbhmac.h jbcrypto/jbhmac.cpp
-        assets/mainTB_Insert.svg
     )
+endif()
+
+if(APPLE)
+    set(MACOSX_BUNDLE_ICON_FILE app.icns)
+    set(APP_ICON "${CMAKE_SOURCE_DIR}/app.icns")
+    set_source_files_properties(${APP_ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
@@ -98,6 +88,18 @@ install(TARGETS ${PROJECT_NAME}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
+
+# ---- macOS Deployment ----
+if(APPLE)
+    get_filename_component(QT_BIN_DIR "${Qt6_DIR}/../../../bin" ABSOLUTE)
+    find_program(MACDEPLOYQT macdeployqt6 HINTS "${QT_BIN_DIR}")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${MACDEPLOYQT} "$<TARGET_BUNDLE_DIR:${PROJECT_NAME}>" -verbose=2
+    )
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND codesign --force --deep --sign - --timestamp=none "$<TARGET_BUNDLE_DIR:${PROJECT_NAME}>"
+    )
+endif()
 
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(${PROJECT_NAME})

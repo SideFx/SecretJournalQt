@@ -3,7 +3,7 @@
 // Purpose:     The main window (header)
 // Author:      Jan Buchholz
 // Created:     2025-10-13
-// Changed:     2026-04-13
+// Changed:     2026-05-22
 /////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -45,7 +45,7 @@ private:
     QString m_lastFolder;
     QString m_fileName;
     Dialogs *mc_dialogs;
-    CipherEngine *m_cipherEngine;
+    CipherEngine m_cipherEngine;
     const QStringList fontSizeList = {"8", "9", "10", "11", "12", "13", "14", "16", "18"};
     const QStringList bulletList = {"\u2022", "\u25CF", "\u2605", "\u26AA", "\u26AB", "\u25FB", "\u25FC"};
     void createToolBars();

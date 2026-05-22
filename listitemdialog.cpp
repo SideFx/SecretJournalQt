@@ -3,6 +3,7 @@
 // Purpose:     Dialog to set note properties (header)
 // Author:      Jan Buchholz
 // Created:     2025-10-13
+// Changed:     2026-05-22
 /////////////////////////////////////////////////////////////////////////////
 
 #include "listitemdialog.h"
@@ -44,11 +45,10 @@ QDialog::DialogCode ListItemDialog::Execute(mode m, QString *subject, int *icon)
 }
 
 void ListItemDialog::setUpIconBox() {
-    IconList *iconList = new IconList();
-    for (int i = 0; i < iconList->m_listIcons.count(); i++) {
-        ui->iconBox->addItem(iconList->getIconAtIndex(i), "", i);
+    IconList iconList;
+    for (int i = 0; i < iconList.m_listIcons.count(); i++) {
+        ui->iconBox->addItem(iconList.getIconAtIndex(i), "", i);
     }
-    delete iconList;
 }
 
 void ListItemDialog::onTextChanged() {

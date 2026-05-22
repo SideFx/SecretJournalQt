@@ -3,18 +3,17 @@
 // Purpose:     Popup to enter password
 // Author:      Jan Buchholz
 // Created:     2025-10-13
-// Changed:     2026-04-05
+// Changed:     2026-05-22
 /////////////////////////////////////////////////////////////////////////////
 
 #include "passworddialog.h"
 #include "ui_passworddialog.h"
 #include <QPushButton>
 
-PasswordDialog::PasswordDialog(QWidget *parent, CipherEngine *cipherEngine) : QDialog(parent),
-    ui(new Ui::PasswordDialog) {
+PasswordDialog::PasswordDialog(QWidget *parent, CipherEngine& cipherEngine) : QDialog(parent),
+    ui(new Ui::PasswordDialog), m_engine(cipherEngine) {
     ui->setupUi(this);
     setFixedSize(this->geometry().width(),this->geometry().height());
-    engine = cipherEngine;
     ui->labelUpper->setText(LABEL_UPPER);
     ui->labelLower->setText(LABEL_LOWER);
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &PasswordDialog::onOkClicked);
@@ -56,7 +55,7 @@ bool PasswordDialog::checkPassword() {
 }
 
 void PasswordDialog::onOkClicked() {
-    engine->initializeVector(qStringToStdVector(ui->lineEditUpper->text()), m_mode);
+    m_engine.initializeVector(qStringToStdVector(ui->lineEditUpper->text()), m_mode);
     setResult(QDialog::Accepted);
 }
 

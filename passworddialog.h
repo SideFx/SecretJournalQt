@@ -3,7 +3,7 @@
 // Purpose:     Header for passworddialog.cpp
 // Author:      Jan Buchholz
 // Created:     2025-10-13
-// Changed:     2026-04-04
+// Changed:     2026-05-22
 /////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -19,14 +19,14 @@ class PasswordDialog : public QDialog {
     Q_OBJECT
 
 public:
-    explicit PasswordDialog(QWidget *parent = nullptr, CipherEngine *cipherEngine = nullptr);
+    explicit PasswordDialog(QWidget *parent, CipherEngine& cipherEngine);
     ~PasswordDialog();
     QDialog::DialogCode Execute(behavior mode);
 
 private:
     Ui::PasswordDialog *ui;
     behavior m_mode;
-    CipherEngine *engine;
+    CipherEngine& m_engine;
     bool checkPassword();
     QString TITLE_ENCRYPT = tr("Password for Encryption");
     QString TITLE_DECRYPT = tr("Password for Decryption");
