@@ -13,7 +13,6 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 
-// QObject(parent) <-- super->constructor( parent )
 UILogic::UILogic(QMainWindow *parent) : QObject(parent), m_mainWindow(parent) {
     createListWidget();
     createEditor();

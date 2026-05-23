@@ -39,3 +39,6 @@ Given that the primary target platforms are Windows and macOS - both universally
 
 **2026-04-13:**
 - New option to insert tab before bullet
+
+**2026-05-22:**
+- - Refactor: Qt-RAII (parent-child relationship, using stack objects)
