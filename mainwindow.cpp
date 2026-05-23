@@ -3,7 +3,7 @@
 // Purpose:     The main window
 // Author:      Jan Buchholz
 // Created:     2025-10-13
-// Changed:     2026-05-22
+// Changed:     2026-05-23
 /////////////////////////////////////////////////////////////////////////////
 
 #include "mainwindow.h"
@@ -200,51 +200,49 @@ void MainWindow::setConnections() {
 }
 
 void MainWindow::savePreferences() {
-    JBPreferences *prefs = new JBPreferences();
-    prefs->PushArray(SET_WGEOMETRY, saveGeometry());
-    prefs->PushArray(SET_WSTATE, saveState(0));
-    prefs->PushArray(SET_SSTATE, m_mainSplitter->saveState());
-    prefs->PushString(SET_LASTFOLDER, m_lastFolder);
-    prefs->PushFont(SET_EDITORFONT, mc_uiLogic->getEditor()->font());
-    prefs->PushFont(SET_LISTFONT, mc_uiLogic->getListWidget()->font());
+    JBPreferences prefs;
+    prefs.PushArray(SET_WGEOMETRY, saveGeometry());
+    prefs.PushArray(SET_WSTATE, saveState(0));
+    prefs.PushArray(SET_SSTATE, m_mainSplitter->saveState());
+    prefs.PushString(SET_LASTFOLDER, m_lastFolder);
+    prefs.PushFont(SET_EDITORFONT, mc_uiLogic->getEditor()->font());
+    prefs.PushFont(SET_LISTFONT, mc_uiLogic->getListWidget()->font());
     quint64 iconSize = mc_uiLogic->getListWidget()->iconSize().width();
-    prefs->PushNumber(SET_ICONSIZE, iconSize);
-    prefs->PushNumber(SET_BULLETSIDX, m_bulletBox->currentIndex());
-    prefs->PushBoolean(SET_TABOPTION, m_tabBox->checkState() == Qt::Checked);
-    prefs->SavePreferencesToDefaultLocation(SET_COMPANY, APPNAME);
-    delete prefs;
+    prefs.PushNumber(SET_ICONSIZE, iconSize);
+    prefs.PushNumber(SET_BULLETSIDX, m_bulletBox->currentIndex());
+    prefs.PushBoolean(SET_TABOPTION, m_tabBox->checkState() == Qt::Checked);
+    prefs.SavePreferencesToDefaultLocation(SET_COMPANY, APPNAME);
 }
 
 void MainWindow::loadPreferences() {
-    JBPreferences *prefs = new JBPreferences();
-    if (prefs->LoadPreferencesFromDefaultLocation(SET_COMPANY, APPNAME)) {
+    JBPreferences prefs;
+    if (prefs.LoadPreferencesFromDefaultLocation(SET_COMPANY, APPNAME)) {
         try {
-            restoreGeometry(prefs->PopArray(SET_WGEOMETRY));
-            restoreState(prefs->PopArray(SET_WSTATE));
-            m_mainSplitter->restoreState(prefs->PopArray(SET_SSTATE));
-            m_lastFolder = prefs->PopString(SET_LASTFOLDER);
-            QFont efont = prefs->PopFont(SET_EDITORFONT);
+            restoreGeometry(prefs.PopArray(SET_WGEOMETRY));
+            restoreState(prefs.PopArray(SET_WSTATE));
+            m_mainSplitter->restoreState(prefs.PopArray(SET_SSTATE));
+            m_lastFolder = prefs.PopString(SET_LASTFOLDER);
+            QFont efont = prefs.PopFont(SET_EDITORFONT);
             if (!efont.family().isEmpty()) {
                 m_fontComboBox->setCurrentFont(efont);
                 QString esize = QString::number(efont.pointSize());
                 if (fontSizeList.indexOf(esize) >= 0) m_fontSizeBox->setCurrentText(esize);
                 mc_uiLogic->getEditor()->setFont(efont);
             }
-            QFont lFont = prefs->PopFont(SET_LISTFONT);
+            QFont lFont = prefs.PopFont(SET_LISTFONT);
             if (!lFont.family().isEmpty()) {
                 mc_uiLogic->getListWidget()->setFont(lFont);
             }
-            quint64 iconSize = prefs->PopNumber(SET_ICONSIZE);
+            quint64 iconSize = prefs.PopNumber(SET_ICONSIZE);
             if (iconSize < MIN_ICONSIZE || iconSize > MAX_ICONSIZE) iconSize = DEF_ICONSIZE;
             mc_uiLogic->getListWidget()->setIconSize(QSize(iconSize, iconSize));
-            quint64 bulletsidx = prefs->PopNumber(SET_BULLETSIDX);
+            quint64 bulletsidx = prefs.PopNumber(SET_BULLETSIDX);
             if (bulletsidx < m_bulletBox->count()) m_bulletBox->setCurrentIndex(bulletsidx);
-            bool b = prefs->PopBoolean(SET_TABOPTION);
+            bool b = prefs.PopBoolean(SET_TABOPTION);
             if (b) m_tabBox->setCheckState(Qt::Checked); else m_tabBox->setCheckState(Qt::Unchecked);
         }
         catch (...) {}
     }
-    delete prefs;
     if (m_lastFolder.isEmpty())
         m_lastFolder = QStandardPaths::writableLocation(QStandardPaths::HomeLocation);
 }
