@@ -54,6 +54,7 @@ endif()
         jbcrypto/jbtwofish.h jbcrypto/jbtwofish.cpp
         jbcrypto/jbselftest.h jbcrypto/jbselftest.cpp
         jbcrypto/jbhmac.h jbcrypto/jbhmac.cpp
+        Info.plist.in
     )
 endif()
 
@@ -68,9 +69,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Qt6::Core Qt6::Widgets Qt6::Networ
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     ${BUNDLE_ID_OPTION}
-#    UPDATE_TRANSLATIONS .
     MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
     MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
+    MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist.in
     MACOSX_BUNDLE TRUE
     WIN32_EXECUTABLE TRUE
 )
@@ -84,13 +85,29 @@ install(TARGETS ${PROJECT_NAME}
 
 # ---- macOS Deployment ----
 if(APPLE)
+    # 1. Create Debug-Entitlements file in the build folder
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/debug_entitlements.plist
+            "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+            "<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://apple.com\">\n"
+            "<plist version=\"1.0\">\n"
+            "<dict>\n"
+            "    <key>com.apple.security.get-task-allow</key>\n"
+            "    <true/>\n"
+            "</dict>\n"
+            "</plist>\n"
+    )
+    # 2. Deploy
     get_filename_component(QT_BIN_DIR "${Qt6_DIR}/../../../bin" ABSOLUTE)
     find_program(MACDEPLOYQT macdeployqt6 HINTS "${QT_BIN_DIR}")
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${MACDEPLOYQT} "$<TARGET_BUNDLE_DIR:${PROJECT_NAME}>" -verbose=2
     )
+    # 3. Sign using two different steps
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND codesign --force --deep --sign - --timestamp=none "$<TARGET_BUNDLE_DIR:${PROJECT_NAME}>"
+        COMMAND codesign --force --sign - --timestamp=none --entitlements
+            ${CMAKE_CURRENT_BINARY_DIR}/debug_entitlements.plist "$<TARGET_FILE:${PROJECT_NAME}>"
+        #COMMAND codesign --force --deep --sign - --timestamp=none "$<TARGET_BUNDLE_DIR:${PROJECT_NAME}>"
     )
 endif()
 

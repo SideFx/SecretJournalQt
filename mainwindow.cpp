@@ -3,7 +3,7 @@
 // Purpose:     The main window
 // Author:      Jan Buchholz
 // Created:     2025-10-13
-// Changed:     2026-05-23
+// Changed:     2026-11-02
 /////////////////////////////////////////////////////////////////////////////
 
 #include "mainwindow.h"
@@ -29,7 +29,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     createStatusBar();
     populateMainMenu();
     setCentralWidget(m_mainSplitter);
-    setUnifiedTitleAndToolBarOnMac(true);
     loadPreferences();
     setConnections();
     fileNew();
@@ -57,9 +56,10 @@ void MainWindow::createToolBars() {
 #if defined(Q_OS_WIN)
     m_mainToolBar->setStyleSheet(styleToolBar);
     m_mainListToolBar->setStyleSheet(styleToolBar);
-#elif defined(Q_OS_MAC)
+#elif defined(Q_OS_MACOS)
     m_mainToolBar->setStyleSheet(styleToolButton);
     m_mainListToolBar->setStyleSheet(styleToolButton);
+    setUnifiedTitleAndToolBarOnMac(true);
 #endif
     this->addToolBar(Qt::TopToolBarArea, m_mainToolBar);
     this->addToolBar(m_mainListToolBar);
@@ -131,16 +131,13 @@ void MainWindow::createSplitters() {
         handle->setVisible(false);
         handle->setEnabled(false);
     }
-#if defined(Q_OS_MAC)
+#if defined(Q_OS_MACOS)
     m_mainSplitter->setStyleSheet(styleSplitterHandle);
 #endif
 }
 
 void MainWindow::createStatusBar() {
     m_statusBar = new QStatusBar(this);
-#if defined(Q_OS_MAC)
-    m_statusBar->setStyleSheet("QStatusBar {background: lightGray;}");
-#endif
     this->setStatusBar(m_statusBar);
 }
 

@@ -3,14 +3,13 @@
 // Purpose:     Cryptographic engine (header)
 // Author:      Jan Buchholz
 // Created:     2026-04-03
-// Changed:     2026-05-22
+// Changed:     2026-11-01
 /////////////////////////////////////////////////////////////////////////////
 
 #pragma once
 
 #include "jbcrypto/jbcommon.hpp"
 #include "constants.h"
-#include "io.h"
 #include <QByteArray>
 
 class CipherEngine {

@@ -41,4 +41,8 @@ Given that the primary target platforms are Windows and macOS - both universally
 - New option to insert tab before bullet
 
 **2026-05-22:**
-- - Refactor: Qt-RAII (parent-child relationship, using stack objects)
+- Refactor: Qt-RAII (parent-child relationship, using stack objects)
+
+**2026-11-02:**
+- macOS 27.2 & Qt6.12: Fixed an issue where Qt Creator no longer stopped at breakpoints
+- macOS: Switched from the official Qt installer to Homebrew

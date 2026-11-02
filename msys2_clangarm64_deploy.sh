@@ -19,7 +19,7 @@ cp "$APP" "$DEPLOY/"
 echo "Qt Deployment..."
 windeployqt6 --release "$APP" --dir "$DEPLOY"
 
-echo "MSYS2/UCRT64 libraries..."
+echo "MSYS2 libraries..."
 ldd "$APP" | grep "clangarm64" | awk '{print $3}' | while read dll; do
     if [ -f "$dll" ]; then
         cp -n "$dll" "$DEPLOY/"
