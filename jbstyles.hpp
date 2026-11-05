@@ -1,5 +1,5 @@
 /////////////////////////////////////////////////////////////////////////////
-// Name:        jbstyles.h
+// Name:        jbstyles.hpp
 // Purpose:     Stylesheets and SVG icon color change
 // Author:      Jan Buchholz
 // Created:     2025-10-13

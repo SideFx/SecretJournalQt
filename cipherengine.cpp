@@ -10,7 +10,7 @@
 #include <QDateTime>
 #include "jbcrypto/jbhmac.h"
 #include "jbcrypto/jbtwofish.h"
-#include "io.h"
+#include "appio.h"
 #include <random>
 
 CipherEngine::CipherEngine() {
@@ -122,13 +122,13 @@ int CipherEngine::encrytAndSave(const QString& filename, const QByteArray& data)
     const std::vector<uint8_t> payload(data.begin(), data.end());
     if (!cipher(payload)) return MSG_INTERNAL_ERROR;
     QByteArray out = toFileFormat();
-    Io io;
+    AppIo io;
     return io.save(filename, out);
 }
 
 int CipherEngine::load(const QString& filename) {
     QByteArray inData;
-    Io io;
+    AppIo io;
     m_iv = {};
     std::memcpy(&m_iv.prefix, &prefixData, PREFIX_DATA_SIZE);
     int iores = io.load(filename, &inData);

@@ -44,7 +44,7 @@ endif()
         iconlist.h iconlist.cpp
         app.icns app.ico appicon.rc
         appicon.rc
-        io.h io.cpp
+        appio.h appio.cpp
         aboutdialog.h aboutdialog.cpp aboutdialog.ui
         passworddialog.ui
         passworddialog.h
