@@ -32,7 +32,7 @@ endif()
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
-        stylesheets.h
+        jbstyles.hpp
         constants.h
         jbpreferences.cpp jbpreferences.h
         resources.qrc
@@ -55,8 +55,14 @@ endif()
         jbcrypto/jbselftest.h jbcrypto/jbselftest.cpp
         jbcrypto/jbhmac.h jbcrypto/jbhmac.cpp
         Info.plist.in
+        jbfontcombobox.hpp
     )
 endif()
+
+#include <jbfontcombobox.hpp> // <-- brackets, because of widget promotion!
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}
+)
 
 if(APPLE)
     set(MACOSX_BUNDLE_ICON_FILE app.icns)

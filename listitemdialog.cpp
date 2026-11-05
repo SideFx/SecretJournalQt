@@ -3,7 +3,7 @@
 // Purpose:     Dialog to set note properties (header)
 // Author:      Jan Buchholz
 // Created:     2025-10-13
-// Changed:     2026-05-22
+// Changed:     2026-11-05
 /////////////////////////////////////////////////////////////////////////////
 
 #include "listitemdialog.h"
@@ -13,6 +13,7 @@
 
 ListItemDialog::ListItemDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ListItemDialog) {
     ui->setupUi(this);
+    setStyleSheet("QDialog { background-color: palette(window); }");
     ui->buttonBox->button(QDialogButtonBox::Ok)->setText(tr("OK"));
     ui->buttonBox->button(QDialogButtonBox::Cancel)->setText(tr("Cancel"));
     setFixedSize(this->geometry().width(),this->geometry().height());

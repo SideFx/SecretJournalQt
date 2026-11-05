@@ -3,7 +3,7 @@
 // Purpose:     Popup to enter password
 // Author:      Jan Buchholz
 // Created:     2025-10-13
-// Changed:     2026-05-22
+// Changed:     2026-11-05
 /////////////////////////////////////////////////////////////////////////////
 
 #include "passworddialog.h"
@@ -13,6 +13,7 @@
 PasswordDialog::PasswordDialog(QWidget *parent, CipherEngine& cipherEngine) : QDialog(parent),
     ui(new Ui::PasswordDialog), m_engine(cipherEngine) {
     ui->setupUi(this);
+    setStyleSheet("QDialog { background-color: palette(window); }");
     setFixedSize(this->geometry().width(),this->geometry().height());
     ui->labelUpper->setText(LABEL_UPPER);
     ui->labelLower->setText(LABEL_LOWER);

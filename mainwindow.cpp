@@ -3,7 +3,7 @@
 // Purpose:     The main window
 // Author:      Jan Buchholz
 // Created:     2025-10-13
-// Changed:     2026-11-02
+// Changed:     2026-11-05
 /////////////////////////////////////////////////////////////////////////////
 
 #include "mainwindow.h"
@@ -12,7 +12,7 @@
 #include <QMessageBox>
 #include <QFileInfo>
 #include <QDir>
-#include "stylesheets.h"
+#include "jbstyles.hpp"
 #include "constants.h"
 #include "jbpreferences.h"
 #include "aboutdialog.h"
@@ -24,6 +24,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     mc_dialogs = new Dialogs(this);
     ui->mainAppInfo->setToolTip(tr("About") + " " + APPNAME);
     ui->mainAppInfo->setText(tr("About") + " " + APPNAME);
+    setIcons();
     createToolBars();
     createSplitters();
     createStatusBar();
@@ -39,27 +40,26 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::createToolBars() {
+    int pointSize = 10;
     m_mainToolBar = new QToolBar(this);
     m_mainToolBar->setObjectName("mainToolbar");
     m_mainToolBar->setMovable(false);
     m_mainToolBar->setOrientation(Qt::Horizontal);
     m_mainToolBar->setAutoFillBackground(true);
     m_mainToolBar->setIconSize(QSize(DEF_ICONSIZE, DEF_ICONSIZE));
-    m_mainToolBar->setFixedHeight(26);
+    m_mainToolBar->setFixedHeight(DEF_TB_HEIGHT);
     m_mainListToolBar = new QToolBar(this);
     m_mainListToolBar->setObjectName("treeToolbar");
     m_mainListToolBar->setMovable(false);
     m_mainListToolBar->setOrientation(Qt::Horizontal);
     m_mainListToolBar->setAutoFillBackground(true);
     m_mainListToolBar->setIconSize(QSize(DEF_ICONSIZE, DEF_ICONSIZE));
-    m_mainListToolBar->setFixedHeight(26);
-#if defined(Q_OS_WIN)
+    m_mainListToolBar->setFixedHeight(DEF_TB_HEIGHT);
+    setUnifiedTitleAndToolBarOnMac(false);
     m_mainToolBar->setStyleSheet(styleToolBar);
     m_mainListToolBar->setStyleSheet(styleToolBar);
-#elif defined(Q_OS_MACOS)
-    m_mainToolBar->setStyleSheet(styleToolButton);
-    m_mainListToolBar->setStyleSheet(styleToolButton);
-    setUnifiedTitleAndToolBarOnMac(true);
+#if defined(Q_OS_MACOS)
+    pointSize = 12;
 #endif
     this->addToolBar(Qt::TopToolBarArea, m_mainToolBar);
     this->addToolBar(m_mainListToolBar);
@@ -86,9 +86,10 @@ void MainWindow::createToolBars() {
     QWidget* spacerSmall = new QWidget(this);
     spacerSmall->setMinimumWidth(25);
     m_mainToolBar->addWidget(spacerSmall);
-    m_fontComboBox = new QFontComboBox(this);
-    m_fontComboBox->setFontFilters(QFontComboBox::ScalableFonts);
+    m_fontComboBox = new JBFontComboBox(this);
+    m_fontComboBox->setFontFilters(JBFontComboBox::ScalableFonts);
     m_fontComboBox->setWritingSystem(QFontDatabase::Latin);
+    m_fontComboBox->setItemFontSize(pointSize);
     m_fontComboBox->setToolTip(tr("Select editor font"));
     m_mainToolBar->addWidget(m_fontComboBox);
     m_fontSizeBox = new QComboBox(this);
@@ -131,14 +132,35 @@ void MainWindow::createSplitters() {
         handle->setVisible(false);
         handle->setEnabled(false);
     }
-#if defined(Q_OS_MACOS)
     m_mainSplitter->setStyleSheet(styleSplitterHandle);
-#endif
 }
 
 void MainWindow::createStatusBar() {
     m_statusBar = new QStatusBar(this);
     this->setStatusBar(m_statusBar);
+    m_statusBar->setStyleSheet(styleStatusBar);
+}
+
+// ---adapt svg icons to selected theme (light/dark)---
+void MainWindow::setIcons() {
+    ui->mainNewFile->setIcon(createThemedIcon(":/tb/assets/mainTB_New.svg"));
+    ui->mainOpenFile->setIcon(createThemedIcon(":/tb/assets/mainTB_Open.svg"));
+    ui->mainSaveFile->setIcon(createThemedIcon(":/tb/assets/mainTB_Save.svg"));
+    ui->mainSaveFileAs->setIcon(createThemedIcon(":/tb/assets/mainTB_SaveAs.svg"));
+    ui->mainAppInfo->setIcon(createThemedIcon(":/tb/assets/mainTB_Info.svg"));
+    ui->mainAppQuit->setIcon(createThemedIcon(":/tb/assets/mainTB_Quit_2.svg"));
+    ui->mainEditCopy->setIcon(createThemedIcon(":/tb/assets/mainTB_Copy.svg"));
+    ui->mainEditCut->setIcon(createThemedIcon(":/tb/assets/mainTB_Cut.svg"));
+    ui->mainEditPaste->setIcon(createThemedIcon(":/tb/assets/mainTB_Paste.svg"));
+    ui->mainEditSelectAll->setIcon(createThemedIcon(":/tb/assets/mainTB_SelectAll.svg"));
+    ui->mainEditUndo->setIcon(createThemedIcon(":/tb/assets/mainTB_Undo.svg"));
+    ui->mainEditRedo->setIcon(createThemedIcon(":/tb/assets/mainTB_Redo.svg"));
+    ui->mainEditInsert->setIcon(createThemedIcon(":/tb/assets/mainTB_Insert.svg"));
+    ui->mainOptionsPassword->setIcon(createThemedIcon(":/tb/assets/mainTB_Key.svg"));
+    ui->listAddNote->setIcon(createThemedIcon(":/tb/assets/treeTB_CreateNote.svg"));
+    ui->listEditNote->setIcon(createThemedIcon(":/tb/assets/mainTB_Edit_2.svg"));
+    ui->listDeleteNote->setIcon(createThemedIcon(":/tb/assets/treeTB_Delete.svg"));
+    ui->listSettings->setIcon(createThemedIcon(":/tb/assets/mainTB_Settings.svg"));
 }
 
 void MainWindow::populateMainMenu() {
@@ -186,7 +208,7 @@ void MainWindow::setConnections() {
     connect(ui->mainOptionsPassword, &QAction::triggered, this, &MainWindow::onOptionsPassword);
     connect(ui->mainAppInfo, &QAction::triggered, this, &MainWindow::onAppInfo);
     connect(ui->mainAppQuit, &QAction::triggered, this, &MainWindow::onAppQuit);
-    connect(m_fontComboBox, &QFontComboBox::currentFontChanged, this, &MainWindow::onCurrentFontChanged);
+    connect(m_fontComboBox, &JBFontComboBox::currentFontChanged, this, &MainWindow::onCurrentFontChanged);
     connect(m_fontSizeBox, &QComboBox::currentTextChanged, this, &MainWindow::onCurrentTextChanged);
     connect(ui->listAddNote, &QAction::triggered, this, &MainWindow::onAddNote);
     connect(ui->listEditNote, &QAction::triggered, this, &MainWindow::onEditNote);
@@ -248,12 +270,12 @@ void MainWindow::setLockStatus() {
     bool b = ui->mainToggleLock->isChecked();
     bool c = mc_uiLogic->getItemCount() > 0;
     if (b) {
-        ui->mainToggleLock->setIcon(QIcon(":/tb/assets/mainTB_Locked.svg"));
+        ui->mainToggleLock->setIcon(createThemedIcon(":/tb/assets/mainTB_Locked.svg"));
         ui->mainToggleLock->setText(tr("Edit mode"));
         ui->mainToggleLock->setToolTip(tr("Switch to edit mode"));
     }
     else {
-        ui->mainToggleLock->setIcon(QIcon(":/tb/assets/mainTB_Unlocked.svg"));
+        ui->mainToggleLock->setIcon(createThemedIcon(":/tb/assets/mainTB_Unlocked.svg"));
         ui->mainToggleLock->setText(tr("View mode"));
         ui->mainToggleLock->setToolTip(tr("Switch to view mode"));
     }
@@ -289,11 +311,20 @@ void MainWindow::closeEvent(QCloseEvent *e) {
     e->accept();
 }
 
+// ---react to theme changes---
+bool MainWindow::event(QEvent *event) {
+    if (event->type() == QEvent::ThemeChange) {
+        setIcons();
+        mc_uiLogic->updateIcons();
+    }
+    return QMainWindow::event(event);
+}
+
 void MainWindow::onTextChanged() {
     if (!mc_uiLogic->getTextChangeIgnore()) setWindowModified(true);
 }
 
-// font combobox
+// ---font combobox---
 void MainWindow::onCurrentFontChanged(const QFont font) {
     QFont f = font;
     if (!f.family().isEmpty()) {
@@ -303,7 +334,7 @@ void MainWindow::onCurrentFontChanged(const QFont font) {
     }
 }
 
-// font size combobox
+// ---font size combobox---
 void MainWindow::onCurrentTextChanged(const QString size) {
     int s = size.toInt();
     QFont font = mc_uiLogic->getEditor()->font();
@@ -492,7 +523,7 @@ bool MainWindow::fileSave(bool saveAs) { //saveAs default false
 }
 
 void MainWindow::settingsAfterLoad() {
-    //enable save, set locked, enable lock, set readonly
+    // ---enable save, set locked, enable lock, set readonly---
     ui->mainSaveFile->setEnabled(true);
     ui->mainSaveFileAs->setEnabled(true);
     ui->mainToggleLock->setChecked(true);
@@ -503,7 +534,7 @@ void MainWindow::settingsAfterLoad() {
 }
 
 void MainWindow::settingsAfterNew() {
-    //disable save, set unlocked, disable lock, set readonly
+    // ---disable save, set unlocked, disable lock, set readonly---
     ui->mainSaveFile->setEnabled(false);
     ui->mainSaveFileAs->setEnabled(false);
     ui->mainToggleLock->setChecked(false);
@@ -511,7 +542,7 @@ void MainWindow::settingsAfterNew() {
     setLockStatus();
     ui->listEditNote->setEnabled(false);
     ui->listDeleteNote->setEnabled(false);
-    //user must add new note first!
+    // ---user must add new note first!---
     mc_uiLogic->getEditor()->setReadOnly(true);
     QString title = QString(APPNAME) + " - " + mc_dialogs->UNTITLED_DOCUMENT + PLACEHOLDER;
     setWindowTitle(title);
@@ -519,7 +550,7 @@ void MainWindow::settingsAfterNew() {
 }
 
 void MainWindow::settingsAfterAddNote() {
-    //enable save, set unlocked, enable lock, set readwrite
+    // ---enable save, set unlocked, enable lock, set readwrite---
     ui->mainSaveFile->setEnabled(true);
     ui->mainSaveFileAs->setEnabled(true);
     ui->mainToggleLock->setChecked(false);

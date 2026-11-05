@@ -3,7 +3,7 @@
 // Purpose:     QListWidget & QTextEdit logic, JSON conversion (header)
 // Author:      Jan Buchholz
 // Created:     2025-10-13
-// Changed:     2026-05-22
+// Changed:     2026-11-05
 /////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -35,6 +35,7 @@ public:
     bool addListItem();
     bool editListItem();
     bool deleteListItem();
+    void updateIcons();
     UILogic::journalData getSelectedListItem();
     bool getTextChangeIgnore() const {return m_textChangeIgnore;}
     void openListSettingsDialog();
@@ -56,6 +57,7 @@ private:
     void jsonToData(QByteArray ba);
     QJsonObject journalDataToJson(journalData data);
     journalData journalDataFromJson(QJsonObject json);
+    const int c_userType = QListWidgetItem::UserType + 1;
 
 private slots:
     void onCurrentItemChanged(QListWidgetItem*, QListWidgetItem*);

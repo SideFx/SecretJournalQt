@@ -3,7 +3,7 @@
 // Purpose:     Constants and text snippets
 // Author:      Jan Buchholz
 // Created:     2025-10-13
-// Changed:     2026-11-02
+// Changed:     2026-11-05
 /////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -12,7 +12,7 @@
 #include <QStringList>
 
 #define APPNAME "SecretJournalQt"
-#define APPVERSION "1.2"
+#define APPVERSION "1.3"
 #define APP_FOLDER "SecretJournalQt"
 #define SET_COMPANY "org.jan.buchholz"
 #define SET_WGEOMETRY "mainwindow/geometry"
@@ -30,6 +30,7 @@
 int constexpr MAX_ICONSIZE = 24;
 int constexpr MIN_ICONSIZE = 12;
 int constexpr DEF_ICONSIZE = 16;
+int constexpr DEF_TB_HEIGHT = 30;
 
 enum behavior {GET = 0, SET};
 
