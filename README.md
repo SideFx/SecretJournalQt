@@ -46,3 +46,11 @@ Given that the primary target platforms are Windows and macOS - both universally
 **2026-11-02:**
 - macOS 27.2 & Qt6.12: Fixed an issue where Qt Creator no longer stopped at breakpoints
 - macOS: Switched from the official Qt installer to Homebrew
+
+**2026-11-05:**
+- App now supports light and dark themes
+- On-the-fly theme switching
+- Refined stylesheets
+- QListWidgetItem, now using Qt::UserRole instead of type() to store the item id
+
+
