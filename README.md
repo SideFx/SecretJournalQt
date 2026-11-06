@@ -53,4 +53,7 @@ Given that the primary target platforms are Windows and macOS - both universally
 - Refined stylesheets
 - QListWidgetItem, now using Qt::UserRole instead of type() to store the item id
 
+**2026-11-06:**
+- Made the ListItem dialog aware of theme changes
+
 

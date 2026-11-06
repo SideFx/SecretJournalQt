@@ -113,7 +113,6 @@ if(APPLE)
         COMMAND codesign --force --deep --sign - --timestamp=none "$<TARGET_BUNDLE_DIR:${PROJECT_NAME}>"
         COMMAND codesign --force --sign - --timestamp=none --entitlements
             ${CMAKE_CURRENT_BINARY_DIR}/debug_entitlements.plist "$<TARGET_FILE:${PROJECT_NAME}>"
-        #COMMAND codesign --force --deep --sign - --timestamp=none "$<TARGET_BUNDLE_DIR:${PROJECT_NAME}>"
     )
 endif()
 
