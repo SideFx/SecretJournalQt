@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////
 // Name:        thememanager.hpp
-// Purpose:     Apply custom light/dark theme (Linux/Windows)
+// Purpose:     Apply custom light/dark theme
 // Author:      Jan Buchholz
 // Created:     2026-11-20
 // Changed:     2026-11-26
