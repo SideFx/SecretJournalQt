@@ -9,7 +9,6 @@
 #include "listitemdialog.h"
 #include "ui_listitemdialog.h"
 #include "iconlist.h"
-#include "jbstyles.hpp"
 #include <QPushButton>
 #include "thememanager.hpp"
 

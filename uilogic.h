@@ -3,7 +3,7 @@
 // Purpose:     QListWidget & QTextEdit logic, JSON conversion (header)
 // Author:      Jan Buchholz
 // Created:     2025-10-13
-// Changed:     2026-11-05
+// Changed:     2026-11-26
 /////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -37,7 +37,6 @@ public:
     bool deleteListItem();
     void updateIcons();
     UILogic::journalData getSelectedListItem();
-    bool getTextChangeIgnore() const {return m_textChangeIgnore;}
     void openListSettingsDialog();
     bool isAnyItemSelected();
     int getItemCount();
@@ -49,7 +48,6 @@ private:
     QTextEdit* m_Editor;
     QVector<journalData> m_data;
     int m_id;
-    bool m_textChangeIgnore;
     void createListWidget();
     void createEditor();
     void setPayload(int id, QString payload);

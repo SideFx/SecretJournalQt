@@ -10,7 +10,6 @@
 #include "listfontdialog.h"
 #include "listitemdialog.h"
 #include "iconlist.h"
-#include "jbstyles.hpp"
 #include <QJsonArray>
 #include <QJsonDocument>
 #include "thememanager.hpp"
@@ -47,7 +46,9 @@ void UILogic::startUp(const QByteArray ba, QString workDir) {
 
 void UILogic::resetAll() {
     m_listWidget->clear();
+    m_Editor->blockSignals(true);
     m_Editor->clear();
+    m_Editor->blockSignals(false);
     m_data.clear();
     m_id = 0;
 }
@@ -64,6 +65,7 @@ void UILogic::createListWidget(){
     m_listWidget->setDragDropMode(QAbstractItemView::InternalMove);
     m_listWidget->setDragDropOverwriteMode(false);
     m_listWidget->setDefaultDropAction(Qt::MoveAction);
+    m_listWidget->setFrameStyle(QStyleOptionFrame::None);
     m_listWidget->setAutoFillBackground(true);
 }
 
@@ -74,6 +76,7 @@ void UILogic::createEditor() {
     m_Editor->setLineWrapMode(QTextEdit::WidgetWidth);
     m_Editor->setOverwriteMode(false);
     m_Editor->setUndoRedoEnabled(true);
+    m_Editor->setFrameStyle(QStyleOptionFrame::None);
     m_Editor->setAutoFillBackground(true);
 }
 
@@ -128,21 +131,6 @@ bool UILogic::editListItem() {
         }
     }
     return changed;
-}
-
-// ---react to theme changes (light/dark)---
-void UILogic::updateIcons() {
-    IconList iconList;
-    for (int i = 0; i < m_listWidget->count(); ++i) {
-        QListWidgetItem *item = m_listWidget->item(i);
-        for (auto &p : m_data) {
-            if (p.id == item->data(Qt::UserRole).toInt()) {
-                item->setIcon(ThemeManager::createThemedIcon(iconList.getIconPathAtIndex(p.icon)));
-                break;
-            }
-        }
-    }
-    m_listWidget->viewport()->update();
 }
 
 bool UILogic::deleteListItem() {
@@ -267,10 +255,10 @@ void UILogic::onCurrentItemChanged(QListWidgetItem *current, QListWidgetItem *pr
         setPayload(previous->data(Qt::UserRole).toInt(), m_Editor->toPlainText());
     }
     if (current) {
-        m_textChangeIgnore = true;
         QString md = getPayLoad(current->data(Qt::UserRole).toInt());
+        m_Editor->blockSignals(true);
         m_Editor->setPlainText(md);
-        m_textChangeIgnore = false;
+        m_Editor->blockSignals(false);
         m_Editor->setFocus();
     }
 }

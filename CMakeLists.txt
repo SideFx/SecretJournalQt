@@ -32,7 +32,6 @@ endif()
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
-        jbstyles.hpp
         constants.h
         jbpreferences.cpp jbpreferences.h
         resources.qrc

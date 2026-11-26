@@ -12,7 +12,6 @@
 #include <QMessageBox>
 #include <QFileInfo>
 #include <QDir>
-#include "jbstyles.hpp"
 #include "constants.h"
 #include "jbpreferences.h"
 #include "aboutdialog.h"
@@ -55,9 +54,7 @@ void MainWindow::createToolBars() {
     m_mainListToolBar->setAutoFillBackground(true);
     m_mainListToolBar->setIconSize(QSize(DEF_ICONSIZE, DEF_ICONSIZE));
     m_mainListToolBar->setFixedHeight(DEF_TB_HEIGHT);
-    setUnifiedTitleAndToolBarOnMac(false);
-    m_mainToolBar->setStyleSheet(styleToolBar);
-    m_mainListToolBar->setStyleSheet(styleToolBar);
+    setUnifiedTitleAndToolBarOnMac(true);
 #if defined(Q_OS_MACOS)
     pointSize = 12;
 #endif
@@ -163,7 +160,7 @@ void MainWindow::createSplitters() {
 void MainWindow::createStatusBar() {
     m_statusBar = new QStatusBar(this);
     this->setStatusBar(m_statusBar);
-    m_statusBar->setStyleSheet(styleStatusBar);
+    m_statusBar->setAutoFillBackground(true);
 }
 
 void MainWindow::populateMainMenu() {
@@ -327,7 +324,7 @@ void MainWindow::onOptionsThemeChanged() {
 }
 
 void MainWindow::onTextChanged() {
-    if (!mc_uiLogic->getTextChangeIgnore()) setWindowModified(true);
+    setWindowModified(true);
 }
 
 // ---font combobox---
