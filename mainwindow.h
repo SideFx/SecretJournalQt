@@ -3,7 +3,7 @@
 // Purpose:     The main window (header)
 // Author:      Jan Buchholz
 // Created:     2025-10-13
-// Changed:     2026-11-05
+// Changed:     2026-11-26
 /////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -33,7 +33,6 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void closeEvent(QCloseEvent *e);
-    bool event(QEvent *event);
 
 private:
     Ui::MainWindow *ui;
@@ -77,6 +76,7 @@ private slots:
     void onSaveFileAs();
     void onListSettings();
     void onOptionsPassword();
+    void onOptionsThemeChanged();
     void onAppInfo();
     void onAppQuit();
     void onEditCopy();

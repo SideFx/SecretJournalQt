@@ -35,7 +35,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>33</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -384,6 +384,21 @@
    </property>
    <property name="toolTip">
     <string>Insert bullet at cursor position</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::MenuRole::NoRole</enum>
+   </property>
+  </action>
+  <action name="mainOptionsTheme">
+   <property name="icon">
+    <iconset resource="resources.qrc">
+     <normaloff>:/tb/assets/mainTB_Theme.svg</normaloff>:/tb/assets/mainTB_Theme.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Switch theme</string>
+   </property>
+   <property name="toolTip">
+    <string>Switch between light and dark mode</string>
    </property>
    <property name="menuRole">
     <enum>QAction::MenuRole::NoRole</enum>

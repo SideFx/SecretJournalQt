@@ -3,7 +3,7 @@
 // Purpose:     The main window
 // Author:      Jan Buchholz
 // Created:     2025-10-13
-// Changed:     2026-11-05
+// Changed:     2026-11-26
 /////////////////////////////////////////////////////////////////////////////
 
 #include "mainwindow.h"
@@ -17,6 +17,7 @@
 #include "jbpreferences.h"
 #include "aboutdialog.h"
 #include "passworddialog.h"
+#include "thememanager.hpp"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
@@ -24,7 +25,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     mc_dialogs = new Dialogs(this);
     ui->mainAppInfo->setToolTip(tr("About") + " " + APPNAME);
     ui->mainAppInfo->setText(tr("About") + " " + APPNAME);
-    setIcons();
     createToolBars();
     createSplitters();
     createStatusBar();
@@ -64,25 +64,42 @@ void MainWindow::createToolBars() {
     this->addToolBar(Qt::TopToolBarArea, m_mainToolBar);
     this->addToolBar(m_mainListToolBar);
     m_mainListToolBar->addAction(ui->listAddNote);
+    ThemeManager::registerActionIcon(ui->listAddNote, ":/tb/assets/treeTB_CreateNote.svg");
     m_mainListToolBar->addAction(ui->listEditNote);
+    ThemeManager::registerActionIcon(ui->listEditNote, ":/tb/assets/mainTB_Edit_2.svg");
     m_mainListToolBar->addAction(ui->listDeleteNote);
+    ThemeManager::registerActionIcon(ui->listDeleteNote, ":/tb/assets/treeTB_Delete.svg");
     m_mainListToolBar->addSeparator();
     m_mainListToolBar->addAction(ui->listSettings);
+    ThemeManager::registerActionIcon(ui->listSettings, ":/tb/assets/mainTB_Settings.svg");
     m_mainToolBar->addAction(ui->mainNewFile);
+    ThemeManager::registerActionIcon(ui->mainNewFile, ":/tb/assets/mainTB_New.svg");
     m_mainToolBar->addAction(ui->mainOpenFile);
+    ThemeManager::registerActionIcon(ui->mainOpenFile, ":/tb/assets/mainTB_Open.svg");
     m_mainToolBar->addAction(ui->mainSaveFile);
+    ThemeManager::registerActionIcon(ui->mainSaveFile, ":/tb/assets/mainTB_Save.svg");
     m_mainToolBar->addAction(ui->mainSaveFileAs);
+    ThemeManager::registerActionIcon(ui->mainSaveFileAs, ":/tb/assets/mainTB_SaveAs.svg");
     m_mainToolBar->addSeparator();
     m_mainToolBar->addAction(ui->mainEditCopy);
+    ThemeManager::registerActionIcon(ui->mainEditCopy, ":/tb/assets/mainTB_Copy.svg");
     m_mainToolBar->addAction(ui->mainEditCut);
+    ThemeManager::registerActionIcon(ui->mainEditCut, ":/tb/assets/mainTB_Cut.svg");
     m_mainToolBar->addAction(ui->mainEditPaste);
+    ThemeManager::registerActionIcon(ui->mainEditPaste, ":/tb/assets/mainTB_Paste.svg");
     m_mainToolBar->addAction(ui->mainEditSelectAll);
+    ThemeManager::registerActionIcon(ui->mainEditSelectAll, ":/tb/assets/mainTB_SelectAll.svg");
     m_mainToolBar->addAction(ui->mainEditUndo);
+    ThemeManager::registerActionIcon(ui->mainEditUndo, ":/tb/assets/mainTB_Undo.svg");
     m_mainToolBar->addAction(ui->mainEditRedo);
+    ThemeManager::registerActionIcon(ui->mainEditRedo, ":/tb/assets/mainTB_Redo.svg");
     m_mainToolBar->addSeparator();
     m_mainToolBar->addAction(ui->mainToggleLock);
+    ThemeManager::registerActionIcon(ui->mainToggleLock, ":/tb/assets/mainTB_Locked.svg");
+    ThemeManager::registerActionIcon(ui->mainToggleLock, ":/tb/assets/mainTB_Unlocked.svg");
     m_mainToolBar->addSeparator();
     m_mainToolBar->addAction(ui->mainOptionsPassword);
+    ThemeManager::registerActionIcon(ui->mainOptionsPassword, ":/tb/assets/mainTB_Key.svg");
     QWidget* spacerSmall = new QWidget(this);
     spacerSmall->setMinimumWidth(25);
     m_mainToolBar->addWidget(spacerSmall);
@@ -107,17 +124,24 @@ void MainWindow::createToolBars() {
     m_bulletBox->setToolTip(tr("Select bullet"));
     m_mainToolBar->addWidget(m_bulletBox);
     m_mainToolBar->addAction(ui->mainEditInsert);
+    ThemeManager::registerActionIcon(ui->mainEditInsert, ":/tb/assets/mainTB_Insert.svg");
     QWidget* spacerLarge = new QWidget(this);
     spacerLarge->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_mainToolBar->addWidget(spacerLarge);
+    m_mainToolBar->addAction(ui->mainOptionsTheme);
+    ThemeManager::registerActionIcon(ui->mainOptionsTheme, ":/tb/assets/mainTB_Theme.svg");
+    m_mainToolBar->addSeparator();
     m_mainToolBar->addAction(ui->mainAppInfo);
+    ThemeManager::registerActionIcon(ui->mainAppInfo, ":/tb/assets/mainTB_Info.svg");
     m_mainToolBar->addAction(ui->mainAppQuit);
+    ThemeManager::registerActionIcon(ui->mainAppQuit, ":/tb/assets/mainTB_Quit_2.svg");
 }
 
 void MainWindow::createSplitters() {
     m_mainSplitter = new QSplitter(this);
     m_mainSplitter->setObjectName("mainSplitter");
     m_mainSplitter->setOrientation(Qt::Horizontal);
+    m_mainSplitter->setHandleWidth(3);
     m_treeSplitter = new QSplitter(this);
     m_treeSplitter->setObjectName("treeSplitter");
     m_treeSplitter->setOrientation(Qt::Vertical);
@@ -132,35 +156,14 @@ void MainWindow::createSplitters() {
         handle->setVisible(false);
         handle->setEnabled(false);
     }
-    m_mainSplitter->setStyleSheet(styleSplitterHandle);
+    m_treeSplitter->setAutoFillBackground(true);
+    m_mainSplitter->setAutoFillBackground(true);
 }
 
 void MainWindow::createStatusBar() {
     m_statusBar = new QStatusBar(this);
     this->setStatusBar(m_statusBar);
     m_statusBar->setStyleSheet(styleStatusBar);
-}
-
-// ---adapt svg icons to selected theme (light/dark)---
-void MainWindow::setIcons() {
-    ui->mainNewFile->setIcon(createThemedIcon(":/tb/assets/mainTB_New.svg"));
-    ui->mainOpenFile->setIcon(createThemedIcon(":/tb/assets/mainTB_Open.svg"));
-    ui->mainSaveFile->setIcon(createThemedIcon(":/tb/assets/mainTB_Save.svg"));
-    ui->mainSaveFileAs->setIcon(createThemedIcon(":/tb/assets/mainTB_SaveAs.svg"));
-    ui->mainAppInfo->setIcon(createThemedIcon(":/tb/assets/mainTB_Info.svg"));
-    ui->mainAppQuit->setIcon(createThemedIcon(":/tb/assets/mainTB_Quit_2.svg"));
-    ui->mainEditCopy->setIcon(createThemedIcon(":/tb/assets/mainTB_Copy.svg"));
-    ui->mainEditCut->setIcon(createThemedIcon(":/tb/assets/mainTB_Cut.svg"));
-    ui->mainEditPaste->setIcon(createThemedIcon(":/tb/assets/mainTB_Paste.svg"));
-    ui->mainEditSelectAll->setIcon(createThemedIcon(":/tb/assets/mainTB_SelectAll.svg"));
-    ui->mainEditUndo->setIcon(createThemedIcon(":/tb/assets/mainTB_Undo.svg"));
-    ui->mainEditRedo->setIcon(createThemedIcon(":/tb/assets/mainTB_Redo.svg"));
-    ui->mainEditInsert->setIcon(createThemedIcon(":/tb/assets/mainTB_Insert.svg"));
-    ui->mainOptionsPassword->setIcon(createThemedIcon(":/tb/assets/mainTB_Key.svg"));
-    ui->listAddNote->setIcon(createThemedIcon(":/tb/assets/treeTB_CreateNote.svg"));
-    ui->listEditNote->setIcon(createThemedIcon(":/tb/assets/mainTB_Edit_2.svg"));
-    ui->listDeleteNote->setIcon(createThemedIcon(":/tb/assets/treeTB_Delete.svg"));
-    ui->listSettings->setIcon(createThemedIcon(":/tb/assets/mainTB_Settings.svg"));
 }
 
 void MainWindow::populateMainMenu() {
@@ -189,6 +192,8 @@ void MainWindow::populateMainMenu() {
     ui->menuOptions->addAction(ui->mainOptionsPassword);
     ui->menuOptions->addSeparator();
     ui->menuOptions->addAction(ui->listSettings);
+    ui->menuOptions->addSeparator();
+    ui->menuOptions->addAction(ui->mainOptionsTheme);
     ui->menuHelp->addAction(ui->mainAppInfo);
 }
 
@@ -206,6 +211,7 @@ void MainWindow::setConnections() {
     connect(ui->mainEditInsert, &QAction::triggered, this, &MainWindow::onEditInsert);
     connect(ui->mainToggleLock, &QAction::triggered, this, &MainWindow::onToggleLock);
     connect(ui->mainOptionsPassword, &QAction::triggered, this, &MainWindow::onOptionsPassword);
+    connect(ui->mainOptionsTheme, &QAction::triggered, this, &MainWindow::onOptionsThemeChanged);
     connect(ui->mainAppInfo, &QAction::triggered, this, &MainWindow::onAppInfo);
     connect(ui->mainAppQuit, &QAction::triggered, this, &MainWindow::onAppQuit);
     connect(m_fontComboBox, &JBFontComboBox::currentFontChanged, this, &MainWindow::onCurrentFontChanged);
@@ -230,6 +236,7 @@ void MainWindow::savePreferences() {
     prefs.PushNumber(SET_ICONSIZE, iconSize);
     prefs.PushNumber(SET_BULLETSIDX, m_bulletBox->currentIndex());
     prefs.PushBoolean(SET_TABOPTION, m_tabBox->checkState() == Qt::Checked);
+    prefs.PushNumber(SET_THEME, static_cast<int>(ThemeManager::getTheme()));
     prefs.SavePreferencesToDefaultLocation(SET_COMPANY, APPNAME);
 }
 
@@ -259,6 +266,8 @@ void MainWindow::loadPreferences() {
             if (bulletsidx < m_bulletBox->count()) m_bulletBox->setCurrentIndex(bulletsidx);
             bool b = prefs.PopBoolean(SET_TABOPTION);
             if (b) m_tabBox->setCheckState(Qt::Checked); else m_tabBox->setCheckState(Qt::Unchecked);
+            ThemeManager::Theme theme = static_cast<ThemeManager::Theme>(prefs.PopNumber(SET_THEME));
+            ThemeManager::applyTheme(theme);
         }
         catch (...) {}
     }
@@ -270,12 +279,12 @@ void MainWindow::setLockStatus() {
     bool b = ui->mainToggleLock->isChecked();
     bool c = mc_uiLogic->getItemCount() > 0;
     if (b) {
-        ui->mainToggleLock->setIcon(createThemedIcon(":/tb/assets/mainTB_Locked.svg"));
+        ui->mainToggleLock->setIcon(ThemeManager::createThemedIcon(":/tb/assets/mainTB_Locked.svg"));
         ui->mainToggleLock->setText(tr("Edit mode"));
         ui->mainToggleLock->setToolTip(tr("Switch to edit mode"));
     }
     else {
-        ui->mainToggleLock->setIcon(createThemedIcon(":/tb/assets/mainTB_Unlocked.svg"));
+        ui->mainToggleLock->setIcon(ThemeManager::createThemedIcon(":/tb/assets/mainTB_Unlocked.svg"));
         ui->mainToggleLock->setText(tr("View mode"));
         ui->mainToggleLock->setToolTip(tr("Switch to view mode"));
     }
@@ -311,13 +320,10 @@ void MainWindow::closeEvent(QCloseEvent *e) {
     e->accept();
 }
 
-// ---react to theme changes---
-bool MainWindow::event(QEvent *event) {
-    if (event->type() == QEvent::ThemeChange) {
-        setIcons();
-        mc_uiLogic->updateIcons();
-    }
-    return QMainWindow::event(event);
+void MainWindow::onOptionsThemeChanged() {
+    ThemeManager::Theme newTheme = (ThemeManager::getTheme() == ThemeManager::Theme::Dark)
+    ? ThemeManager::Theme::Light : ThemeManager::Theme::Dark;
+    ThemeManager::applyTheme(newTheme);
 }
 
 void MainWindow::onTextChanged() {

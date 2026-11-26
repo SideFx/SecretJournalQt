@@ -3,7 +3,7 @@
 // Purpose:     Constants and text snippets
 // Author:      Jan Buchholz
 // Created:     2025-10-13
-// Changed:     2026-11-05
+// Changed:     2026-11-26
 /////////////////////////////////////////////////////////////////////////////
 
 #pragma once
@@ -12,7 +12,7 @@
 #include <QStringList>
 
 #define APPNAME "SecretJournalQt"
-#define APPVERSION "1.3"
+#define APPVERSION "1.4"
 #define APP_FOLDER "SecretJournalQt"
 #define SET_COMPANY "org.jan.buchholz"
 #define SET_WGEOMETRY "mainwindow/geometry"
@@ -25,6 +25,7 @@
 #define SET_ICONSIZE "options/iconsize"
 #define SET_BULLETSIDX "options/bulletsindex"
 #define SET_TABOPTION "options/tab"
+#define SET_THEME "options/theme"
 #define PLACEHOLDER " [*]"
 
 int constexpr MAX_ICONSIZE = 24;

@@ -33,6 +33,7 @@
         <file>assets/mainTB_FormatStrikethrough.svg</file>
         <file>assets/mainTB_FormatUnderlined.svg</file>
         <file>assets/mainTB_Insert.svg</file>
+        <file>assets/mainTB_Theme.svg</file>
     </qresource>
     <qresource prefix="/list">
         <file>assets/list_Article.svg</file>

@@ -56,6 +56,7 @@ endif()
         jbcrypto/jbhmac.h jbcrypto/jbhmac.cpp
         Info.plist.in
         jbfontcombobox.hpp
+        thememanager.hpp
     )
 endif()
 

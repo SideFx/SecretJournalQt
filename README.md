@@ -56,4 +56,6 @@ Given that the primary target platforms are Windows and macOS - both universally
 **2026-11-06:**
 - Made the ListItem dialog aware of theme changes
 
+**2026-11-26:**
+- Implemented a theme manager to switch between light/dark palette and redraw the svg icons
 

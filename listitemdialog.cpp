@@ -3,7 +3,7 @@
 // Purpose:     Dialog to set note properties (header)
 // Author:      Jan Buchholz
 // Created:     2025-10-13
-// Changed:     2026-11-06
+// Changed:     2026-11-26
 /////////////////////////////////////////////////////////////////////////////
 
 #include "listitemdialog.h"
@@ -11,6 +11,7 @@
 #include "iconlist.h"
 #include "jbstyles.hpp"
 #include <QPushButton>
+#include "thememanager.hpp"
 
 ListItemDialog::ListItemDialog(QWidget *parent) : QDialog(parent), ui(new Ui::ListItemDialog) {
     ui->setupUi(this);
@@ -51,7 +52,7 @@ void ListItemDialog::setUpIconBox() {
     IconList iconList;
     ui->iconBox->clear();
     for (int i = 0; i < iconList.m_listIcons.count(); i++) {
-        ui->iconBox->addItem(createThemedIcon(iconList.getIconPathAtIndex(i)), "", i);
+        ui->iconBox->addItem(ThemeManager::createThemedIcon(iconList.getIconPathAtIndex(i)), "", i);
     }
 }
 

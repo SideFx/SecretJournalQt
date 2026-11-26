@@ -3,7 +3,7 @@
 // Purpose:     The main window (header)
 // Author:      Jan Buchholz
 // Created:     2025-10-13
-// Changed:     2026-11-05
+// Changed:     2026-11-26
 /////////////////////////////////////////////////////////////////////////////
 
 #include "uilogic.h"
@@ -13,6 +13,7 @@
 #include "jbstyles.hpp"
 #include <QJsonArray>
 #include <QJsonDocument>
+#include "thememanager.hpp"
 
 UILogic::UILogic(QMainWindow *parent) : QObject(parent), m_mainWindow(parent) {
     createListWidget();
@@ -32,7 +33,7 @@ void UILogic::startUp(const QByteArray ba, QString workDir) {
     for (auto &j : m_data) {
         QListWidgetItem *item = new QListWidgetItem(m_listWidget, c_userType);
         item->setData(Qt::UserRole, j.id);
-        item->setIcon(createThemedIcon(iconList.getIconPathAtIndex(j.icon)));
+        item->setIcon(ThemeManager::createThemedIcon(iconList.getIconPathAtIndex(j.icon)));
         item->setText(j.subject);
         m_listWidget->addItem(item);
         if (m_id < j.id) m_id = j.id;
@@ -63,6 +64,7 @@ void UILogic::createListWidget(){
     m_listWidget->setDragDropMode(QAbstractItemView::InternalMove);
     m_listWidget->setDragDropOverwriteMode(false);
     m_listWidget->setDefaultDropAction(Qt::MoveAction);
+    m_listWidget->setAutoFillBackground(true);
 }
 
 void UILogic::createEditor() {
@@ -72,6 +74,7 @@ void UILogic::createEditor() {
     m_Editor->setLineWrapMode(QTextEdit::WidgetWidth);
     m_Editor->setOverwriteMode(false);
     m_Editor->setUndoRedoEnabled(true);
+    m_Editor->setAutoFillBackground(true);
 }
 
 bool UILogic::addListItem() {
@@ -85,7 +88,7 @@ bool UILogic::addListItem() {
         IconList iconList;
         QListWidgetItem *item = new QListWidgetItem(m_listWidget, c_userType);
         item->setData(Qt::UserRole, data.id);
-        item->setIcon(createThemedIcon(iconList.getIconPathAtIndex(data.icon)));
+        item->setIcon(ThemeManager::createThemedIcon(iconList.getIconPathAtIndex(data.icon)));
         item->setText(data.subject);
         m_listWidget->addItem(item);
         m_listWidget->setCurrentItem(item);
@@ -114,7 +117,7 @@ bool UILogic::editListItem() {
     QString text = item->text();
     if (dlg.Execute(ListItemDialog::edit, &text, &icon) == QDialog::Accepted) {
         item->setText(text);
-        item->setIcon(createThemedIcon(iconList.getIconPathAtIndex(icon)));
+        item->setIcon(ThemeManager::createThemedIcon(iconList.getIconPathAtIndex(icon)));
         for (auto &p : m_data) {
             if (p.id == item->data(Qt::UserRole).toInt()) {
                 if (icon != p.icon || text != p.subject) changed = true;
@@ -134,7 +137,7 @@ void UILogic::updateIcons() {
         QListWidgetItem *item = m_listWidget->item(i);
         for (auto &p : m_data) {
             if (p.id == item->data(Qt::UserRole).toInt()) {
-                item->setIcon(createThemedIcon(iconList.getIconPathAtIndex(p.icon)));
+                item->setIcon(ThemeManager::createThemedIcon(iconList.getIconPathAtIndex(p.icon)));
                 break;
             }
         }
