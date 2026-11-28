@@ -90,7 +90,7 @@ install(TARGETS ${PROJECT_NAME}
 )
 
 # ---- macOS Deployment ----
-if(APPLE)
+if(APPLE AND NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     # 1. Create Debug-Entitlements file in the build folder
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/debug_entitlements.plist
             "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
